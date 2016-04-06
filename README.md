@@ -1,6 +1,8 @@
 # PyFunt
 
-## Pythonic Deep Learning Framework
+### Pythonic Deep Learning Framework
+
+## Description 
 
 This repo mostly contains my solutions for Stanford's cs231n assignments, extended and eventually readapted to be part of a single framework, or to bring some feature from other framework like Torch, plus some other cool staff.
 
