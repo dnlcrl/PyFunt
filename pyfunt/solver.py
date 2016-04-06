@@ -1,5 +1,5 @@
 import numpy as np
-from nnet.data.data_augmentation import *
+from data.data_augmentation import *
 from datetime import datetime
 import optim
 import os
