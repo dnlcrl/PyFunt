@@ -1,3 +1,22 @@
+# OSX cache files
+.DS_Store
+
+# images
+*.png
+
+# models
+*model
+
+# checkpoints
+checkpoints/
+
+# datasets
+cifar-10-batches-py/
+gtsrb/
+
+# notebooks
+noteboook/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

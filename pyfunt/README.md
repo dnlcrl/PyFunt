@@ -1,37 +1,15 @@
-# PyFunt
+# ./nnet/ Directory
 
-## Pythonic Deep Learning Framework
+In this folder contains solutions for cs231n assignments and some other cool staff.
 
-This repo mostly contains my solutions for Stanford's cs231n assignments, extended and eventually readapted to be part of a single framework, or to bring some feature from other framework like Torch, plus some other cool staff.
-
-## Requirements
-
-- [Python 2.7](https://www.python.org/)
-- [Cython](cython.org/)
-- [matplotlib](matplotlib.org/)
-- [numpy](www.numpy.org/)
-- [scipy](www.scipy.org/)
-- [cv2](opencv.org) (only for loading GTSRB)
-- [scikit_learn](scikit-learn.org/)
-
-After you get Python, you can get [pip](https://pypi.python.org/pypi/pip) and install all requirements by running:
-	
-	pip install -r /path/to/requirements.txt
-
-
-# Directory Structure
-.
-+-- README.md
-+-- __init__.py
-+-- optim.py
-+-- solver.py
-+-- utils/
-+-- layers/
-+-- data/
-
-## README.md
-
-This File.
+	# Directory Structure
+	.
+	+-- __init__.py
+	+-- optim.py
+	+-- solver.py
+	+-- utils/
+	+-- layers/
+	+-- data/
 
 ## optim.py
 
@@ -67,5 +45,4 @@ Check layers/README.md
 ## data/
 
 Check data/README.md
-
 
