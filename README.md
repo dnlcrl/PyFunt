@@ -1,4 +1,4 @@
-# PyFunt
+# PyFunt (/paɪfʊnt/)
 
 Pythonic Deep Learning Framework (WIP)
 
