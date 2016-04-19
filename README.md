@@ -16,18 +16,9 @@ This repo mostly contains my solutions for Stanford's cs231n assignments (winter
 
 ## Installation
 
-- You can get [pip](https://pypi.python.org/pypi/pip) and install everything by running:
+Get [pip](https://pypi.python.org/pypi/pip) and run:
 
-		pip install git+git://github.com/dnlcrl/PyFunt.git
-
-- **alternatively**, you can download this repo and install all requirements by running:
-
-		pip install -r /path/to/requirements.txt
-
-	then to install the `pyfunt` package you can run:
-
-		python path/to/setup.py install
-
+	pip install git+git://github.com/dnlcrl/PyFunt.git
 
 ## Usage
 
