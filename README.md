@@ -1,6 +1,6 @@
 # PyFunt (/paɪfʊnt/)
 
-Pythonic Deep Learning Framework (WIP)
+Pythonic Deep Learning Framework (WIP and CPU only ATM)
 
 ## Description 
 
