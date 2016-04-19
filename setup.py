@@ -6,8 +6,9 @@ import sys
 import subprocess
 
 '''
-SOURCE: https://github.com/scipy/scipy/blob/master/setup.py
+Original Source: https://github.com/scipy/scipy/blob/master/setup.py
 '''
+
 if sys.version_info[:2] < (2, 6) or (3, 0) <= sys.version_info[0:2] < (3, 2):
     raise RuntimeError("Python version 2.6, 2.7 or >= 3.2 required.")
 
@@ -88,16 +89,16 @@ def get_version_info():
 
 
 def write_version_py(filename='pyfunt/version.py'):
-    cnt = """
-# THIS FILE IS GENERATED FROM PYFUNT SETUP.PY
-short_version = '%(version)s'
-version = '%(version)s'
-full_version = '%(full_version)s'
-git_revision = '%(git_revision)s'
-release = %(isrelease)s
-if not release:
-    version = full_version
-"""
+    cnt = """\
+        # THIS FILE IS GENERATED FROM PYFUNT SETUP.PY\
+        short_version = '%(version)s'\
+        version = '%(version)s'\
+        full_version = '%(full_version)s'\
+        git_revision = '%(git_revision)s'\
+        release = %(isrelease)s\
+        if not release:\
+            version = full_version\
+    """
     FULLVERSION, GIT_REVISION = get_version_info()
 
     a = open(filename, 'w')
