@@ -7,7 +7,6 @@ cimport cython
 
 ctypedef fused DTYPE_t:
     np.float64_t
-    np.float64_t
 
 def im2col_cython(np.ndarray[DTYPE_t, ndim=4] x, int field_height,
                   int field_width, int padding, int stride):

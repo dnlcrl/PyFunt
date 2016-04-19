@@ -11,8 +11,18 @@ conv_backward = conv_backward_fast
 
 avg_pool_forward = avg_pool_forward_fast
 avg_pool_backward = avg_pool_backward_fast
-max_pool_forward = avg_pool_forward_fast
-max_pool_backward = avg_pool_backward_fast
+max_pool_forward = max_pool_forward_fast
+max_pool_backward = max_pool_backward_fast
+
+
+def spatial_reflection_padding(array, pad_width, pad_type='even'):
+    '''https://twitter.com/karpathy/status/720622989289644033'''
+    return np.pad(array, pad_width, 'reflect', pad_type)
+
+
+def spatial_replication_padding(array, pad_width):
+    '''https://twitter.com/karpathy/status/720622989289644033'''
+    return np.pad(array, pad_width, 'edge')
 
 
 def skip_forward(x, n_out_channels):
