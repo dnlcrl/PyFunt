@@ -443,8 +443,13 @@ class Solver(object):
         '''
         if self.acc_check_train_pre_process:
             X_tr_check = self.acc_check_train_pre_process(self.X_train[:1000])
+        else:
+            X_tr_check = self.X_train[:1000]
+
         if self.acc_check_val_pre_process:
             X_val_check = self.acc_check_val_pre_process(self.X_val)
+        else:
+            X_val_check = self.X_val
 
         train_acc = self.check_accuracy(
             X_tr_check, self.y_train[:1000])
