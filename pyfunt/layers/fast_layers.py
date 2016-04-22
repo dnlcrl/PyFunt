@@ -88,7 +88,6 @@ def conv_backward_strides(dout, cache):
 
     dx_cols = w.reshape(F, -1).T.dot(dout_reshaped)
     dx_cols.shape = (C, HH, WW, N, out_h, out_w)
-    import pdb; pdb.set_trace()
     dx = col2im_6d_cython(dx_cols, N, C, H, W, HH, WW, pad, stride)
 
     return dx, dw, db
