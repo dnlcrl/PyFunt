@@ -19,7 +19,7 @@ else:
 
 MAJOR = 0
 MINOR = 1
-MICRO = 0
+MICRO = 1
 ISRELEASED = False
 
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
@@ -89,15 +89,15 @@ def get_version_info():
 
 
 def write_version_py(filename='pyfunt/version.py'):
-    cnt = """\
-        # THIS FILE IS GENERATED FROM PYFUNT SETUP.PY\
-        short_version = '%(version)s'\
-        version = '%(version)s'\
-        full_version = '%(full_version)s'\
-        git_revision = '%(git_revision)s'\
-        release = %(isrelease)s\
-        if not release:\
-            version = full_version\
+    cnt = """
+# THIS FILE IS GENERATED FROM PYFUNT SETUP.PY
+short_version = '%(version)s'
+version = '%(version)s'
+full_version = '%(full_version)s'
+git_revision = '%(git_revision)s'
+release = %(isrelease)s
+if not release:
+    version = full_version
     """
     FULLVERSION, GIT_REVISION = get_version_info()
 
