@@ -429,7 +429,6 @@ class Solver(object):
                     raise e
             self.pbar.update(end - start)
 
-        print
         y_pred = np.hstack(y_pred)
         if return_preds:
             return y_pred
