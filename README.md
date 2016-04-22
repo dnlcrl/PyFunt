@@ -4,7 +4,7 @@ Pythonic Deep Learning Framework (WIP and CPU only at the moment)
 
 ## Description 
 
-A Pythonic DL framework. Basically my Stanford's cs231n final project (winter 2016) and part of my master's thesis on convolutional neural networks, partially composed by my assignments' solutions, extended and eventually readapted to be part of a single framework or to bring some feature from other frameworks like Torch, plus some other cool stuff.
+A Pythonic DL framework. Basically my Stanford's cs231n final project (winter 2016) and part of my master's thesis on convolutional neural networks. The framework is partially composed by my assignments' solutions, extended and eventually readapted to be part of a single framework or to bring some feature from other frameworks like Torch, plus some other cool stuff.
 
 ## Requirements
 
@@ -26,4 +26,4 @@ Check this repo for an example: TODO
 
 ---
  
-Check the READMEs through the directories to get more info about each file.
+Check the READMEs through the directories to get more info about each file. But you most probably want to know more about the [implemented layers](https://github.com/dnlcrl/PyFunt/tree/master/pyfunt/layers)
