@@ -26,4 +26,4 @@ Check this repo for an example: TODO
 
 ---
  
-Check the READMEs through the directories to get more info about each file. But you most probably want to know more about the [implemented layers](https://github.com/dnlcrl/PyFunt/tree/master/pyfunt/layers)
+Check the READMEs through the directories to get more info about each file. But you most probably want to know more about the [implemented layers](https://github.com/dnlcrl/PyFunt/tree/master/pyfunt/layers).
