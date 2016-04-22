@@ -149,14 +149,6 @@ class Solver(object):
           parameter, if not False the instruction
           self.lr_decay = custom_update_ld(self.epoch) is executed at the and
           of each epoch.
-        - acc_check_train_pre_process: optional function to pre-process the
-          training subset for checking accuracy on training data.
-          If not False acc_check_train_pre_process is called before each
-          accuracy check.
-        - acc_check_val_pre_process: optional function to pre-process the
-          validation data.
-          If not False acc_check_val_pre_process is called on the validation
-          before each accuracy check.
         - batch_augment_func: optional function to augment the batch data.
           If not False X_batch = batch_augment_func(X_batch) is called before
           each training step.
@@ -184,9 +176,6 @@ class Solver(object):
         self.path_checkpoints = kwargs.pop('path_checkpoints', 'checkpoints')
         self.checkpoint_every = kwargs.pop('checkpoint_every', 0)
         self.custom_update_ld = kwargs.pop('custom_update_ld', False)
-        self.acc_check_train_pre_process = kwargs.pop(
-            'acc_check_train_pre_process', False)
-        self.acc_check_val_pre_process = kwargs.pop('acc_check_val_pre_process', False)
         self.batch_augment_func = kwargs.pop('batch_augment_func', False)
         self.num_processes = kwargs.pop('num_processes', 1)
 
@@ -429,6 +418,7 @@ class Solver(object):
                     raise e
             self.pbar.update(end - start)
 
+        print
         y_pred = np.hstack(y_pred)
         if return_preds:
             return y_pred
@@ -440,19 +430,9 @@ class Solver(object):
         '''
         Check accuracy for both X_train[:1000] and X_val.
         '''
-        if self.acc_check_train_pre_process:
-            X_tr_check = self.acc_check_train_pre_process(self.X_train[:1000])
-        else:
-            X_tr_check = self.X_train[:1000]
-
-        if self.acc_check_val_pre_process:
-            X_val_check = self.acc_check_val_pre_process(self.X_val)
-        else:
-            X_val_check = self.X_val
-
         train_acc = self.check_accuracy(
-            X_tr_check, self.y_train[:1000])
-        val_acc = self.check_accuracy(X_val_check, self.y_val)
+            self.X_train[:1000], self.y_train[:1000])
+        val_acc = self.check_accuracy(self.X_val, self.y_val)
         self.train_acc_history.append(train_acc)
         self.val_acc_history.append(val_acc)
 

@@ -106,7 +106,8 @@ cdef col2im_6d_cython_inner(np.ndarray[DTYPE_t, ndim=6] cols,
                             x_padded[n, c, stride * h + hh, stride * w + ww] += cols[c, hh, ww, n, h, w]
     
 
-def col2im_6d_cython(np.ndarray[DTYPE_t, ndim=6] cols, int N, int C, int H, int W, int HH, int WW, int pad, int stride):
+def col2im_6d_cython(np.ndarray[DTYPE_t, ndim=6] cols, int N, int C, int H, int W,
+        int HH, int WW, int pad, int stride):
     cdef np.ndarray x = np.empty((N, C, H, W), dtype=cols.dtype)
     cdef int out_h = (H + 2 * pad - HH) / stride + 1
     cdef int out_w = (W + 2 * pad - WW) / stride + 1
