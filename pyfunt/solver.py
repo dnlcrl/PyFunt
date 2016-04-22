@@ -184,9 +184,9 @@ class Solver(object):
         self.path_checkpoints = kwargs.pop('path_checkpoints', 'checkpoints')
         self.checkpoint_every = kwargs.pop('checkpoint_every', 0)
         self.custom_update_ld = kwargs.pop('custom_update_ld', False)
-        self.custom_update_ld = kwargs.pop(
+        self.acc_check_train_pre_process = kwargs.pop(
             'acc_check_train_pre_process', False)
-        self.custom_update_ld = kwargs.pop('acc_check_val_pre_process', False)
+        self.acc_check_val_pre_process = kwargs.pop('acc_check_val_pre_process', False)
         self.batch_augment_func = kwargs.pop('batch_augment_func', False)
         self.num_processes = kwargs.pop('num_processes', 1)
 
