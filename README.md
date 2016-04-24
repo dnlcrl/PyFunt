@@ -22,8 +22,8 @@ Get [pip](https://pypi.python.org/pypi/pip) and run:
 
 ## Usage
 
-Check this repo for an example: TODO
+Check this repo for an example: WIP
 
 ---
  
-Check the READMEs through the directories to get more info about each file. But you most probably want to know more about the [implemented layers](https://github.com/dnlcrl/PyFunt/tree/master/pyfunt/layers).
+Check the READMEs through the directories to get more infos about each file. But you most probably want to know more about the [implemented layers](https://github.com/dnlcrl/PyFunt/tree/master/pyfunt/layers).
