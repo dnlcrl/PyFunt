@@ -410,6 +410,7 @@ class Solver(object):
         else:
             y_pred = []
         self.pbar = tqdm(total=N, desc='Accuracy Check', unit='im')
+        self.model.return_probs = return_probs
         # Compute loss and gradient
         for i in xrange(num_batches):
             start = i * batch_size
@@ -439,8 +440,7 @@ class Solver(object):
 
         print
         if return_probs:
-            y_probs = np.hstack(y_probs)
-            return y_probs
+            return np.concatenate(y_probs)
 
         y_pred = np.hstack(y_pred)
         if return_preds:

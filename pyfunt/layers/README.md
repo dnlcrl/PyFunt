@@ -103,7 +103,7 @@ Layers definitions:
 
 ## setup.py
 
-File neede to compile the im2col_cython.pyx so it can produce the .c extension file to load in fast_layers.py. to build the needed im2col_cython.c run:
+Installation file, if you need to recompile the pyx file you can run the following command in this directory:
 	
 	python setup.py build_ext --inplace
 
