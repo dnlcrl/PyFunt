@@ -376,7 +376,7 @@ class Solver(object):
             self.model.params[p] = next_w
             self.optim_configs[p] = next_config
 
-    def check_accuracy(self, X, y=None, num_samples=None, batch_size=100, return_preds=False):
+    def check_accuracy(self, X, y=None, num_samples=None, batch_size=100, return_preds=False, return_probs=False):
         '''
         Check accuracy of the model on the provided data.
 
@@ -392,7 +392,6 @@ class Solver(object):
         - acc: Scalar giving the fraction of instances that were correctly
           classified by the model.
         '''
-        assert (y is None and return_preds) or not(y is None and return_preds)
 
         # Maybe subsample the data
         N = X.shape[0]
@@ -406,7 +405,10 @@ class Solver(object):
         num_batches = N / batch_size
         if N % batch_size != 0:
             num_batches += 1
-        y_pred = []
+        if return_probs:
+            y_probs = []
+        else:
+            y_pred = []
         self.pbar = tqdm(total=N, desc='Accuracy Check', unit='im')
         # Compute loss and gradient
         for i in xrange(num_batches):
@@ -415,14 +417,20 @@ class Solver(object):
 
             if not self.multiprocessing:
                 scores = self.model.loss(X[start:end])
-                y_pred.append(np.argmax(scores, axis=1))
+                if return_probs:
+                    y_probs.append(scores)
+                else:
+                    y_pred.append(np.argmax(scores, axis=1))
             else:
                 X_subs = np.split(X[start:end], self.num_processes)
                 try:
                     results = self.pool.map_async(
                         self.model.loss, X_subs).get()
                     for r in results:
-                        y_pred.append(np.argmax(r, axis=1))
+                        if return_probs:
+                            y_probs.append(r)
+                        else:
+                            y_pred.append(np.argmax(r, axis=1))
                 except Exception, e:
                     self.pool.terminate()
                     self.pool.join()
@@ -430,6 +438,10 @@ class Solver(object):
             self.pbar.update(end - start)
 
         print
+        if return_probs:
+            y_probs = np.hstack(y_probs)
+            return y_probs
+
         y_pred = np.hstack(y_pred)
         if return_preds:
             return y_pred
