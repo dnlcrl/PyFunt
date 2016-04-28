@@ -1,10 +1,6 @@
 # PyFunt (/paɪfʊnt/)
 
-Pythonic Deep Learning Framework (WIP and CPU only at the moment)
-
-## Description 
-
-A simple Pythonic DL framework.
+A simple Pythonic Deep Learning Framework (WIP and CPU only at the moment)
 
 ## Requirements
 
