@@ -18,7 +18,7 @@ Get [pip](https://pypi.python.org/pypi/pip) and run:
 
 ## Usage
 
-Check this repo for an example: WIP
+Check this repo for an example: [Implementation of deep residual networks in PyFunt](https://github.com/dnlcrl/deep-residual-networks-pyfunt)
 
 ---
  
