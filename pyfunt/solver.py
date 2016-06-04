@@ -183,6 +183,7 @@ class Solver(object):
         # Personal Edits
         self.path_checkpoints = kwargs.pop('path_checkpoints', 'checkpoints')
         self.checkpoint_every = kwargs.pop('checkpoint_every', 0)
+        self.check_and_swap_every = kwargs.pop('check_and_swap_every', 0)
         self.custom_update_ld = kwargs.pop('custom_update_ld', False)
         self.acc_check_train_pre_process = kwargs.pop(
             'acc_check_train_pre_process', False)
@@ -523,7 +524,8 @@ class Solver(object):
                 if self.checkpoint_every and (self.epoch % self.checkpoint_every == 0):
                     self.make_check_point()
 
-                self._check_and_swap(it)
+                if not self.check_and_swap_every or (self.epoch % self.check_and_swap_every == 0):
+                    self._check_and_swap(it)
                 finish = it == num_iterations - 1
                 if not finish:
                     if lr_decay_updated:
