@@ -31,14 +31,15 @@ def init_conv_w_kaiming(shape, gain=2.):
     return np.random.normal(0., std, shape)
 
 
-def init_affine_wb(shape):
+def init_affine_wb(shape, std=None):
     '''
     Initialize affine layer's weights and biases like torch's linear \
     default behaviour, called by _init_affine_weights
     For more infos: https://github.com/torch/nn/blob/master/Linear.lua
     '''
-    std = 1./np.sqrt(shape[0])
-    w = np.random.normal(0, 3e-4, shape)
+    if not std:
+        std = 1./np.sqrt(shape[0])
+    w = np.random.normal(0, std, shape)
     b = np.zeros(shape[1])
     return w, b
 
