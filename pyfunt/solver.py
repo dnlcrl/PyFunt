@@ -540,7 +540,7 @@ class Solver(object):
                         if not self.silent_train:
                             print 'learning_rate updated: ', next(self.optim_configs.itervalues())['learning_rate']
                         lr_decay_updated = False
-                    print
+                    if not self.silent_train: print
                     self._new_training_bar(images_per_epochs)
 
         # At the end of training swap the best params into the model
