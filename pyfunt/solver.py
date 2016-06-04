@@ -537,7 +537,8 @@ class Solver(object):
                 finish = it == num_iterations - 1
                 if not finish:
                     if lr_decay_updated:
-                        print 'learning_rate updated: ', next(self.optim_configs.itervalues())['learning_rate']
+                        if not self.silent_train:
+                            print 'learning_rate updated: ', next(self.optim_configs.itervalues())['learning_rate']
                         lr_decay_updated = False
                     print
                     self._new_training_bar(images_per_epochs)
