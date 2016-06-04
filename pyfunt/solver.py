@@ -184,10 +184,12 @@ class Solver(object):
         self.path_checkpoints = kwargs.pop('path_checkpoints', 'checkpoints')
         self.checkpoint_every = kwargs.pop('checkpoint_every', 0)
         self.check_and_swap_every = kwargs.pop('check_and_swap_every', 0)
+        self.silent_train = kwargs.pop('silent_train', False)
         self.custom_update_ld = kwargs.pop('custom_update_ld', False)
         self.acc_check_train_pre_process = kwargs.pop(
             'acc_check_train_pre_process', False)
-        self.acc_check_val_pre_process = kwargs.pop('acc_check_val_pre_process', False)
+        self.acc_check_val_pre_process = kwargs.pop(
+            'acc_check_val_pre_process', False)
         self.batch_augment_func = kwargs.pop('batch_augment_func', False)
         self.num_processes = kwargs.pop('num_processes', 1)
 
@@ -485,9 +487,14 @@ class Solver(object):
         '''
         Create a new loading bar.
         '''
-        d = 'Epoch %d / %d' % (
-            self.epoch + 1, self.num_epochs)
-        self.pbar = tqdm(total=total, desc=d, unit='im')
+        if not self.silent_train:
+            d = 'Epoch %d / %d' % (
+                self.epoch + 1, self.num_epochs)
+            self.pbar = tqdm(total=total, desc=d, unit='s.')
+
+    def _update_bar(self, amount):
+        if not self.silent_train:
+            self.pbar.update(amount)
 
     def train(self):
         '''
@@ -506,7 +513,7 @@ class Solver(object):
         for it in xrange(num_iterations):
 
             self._step()
-            self.pbar.update(self.batch_size)
+            self._update_bar(self.batch_size)
 
             epoch_end = (it + 1) % iterations_per_epoch == 0
 
@@ -526,6 +533,7 @@ class Solver(object):
 
                 if not self.check_and_swap_every or (self.epoch % self.check_and_swap_every == 0):
                     self._check_and_swap(it)
+
                 finish = it == num_iterations - 1
                 if not finish:
                     if lr_decay_updated:
