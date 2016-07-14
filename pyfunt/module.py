@@ -23,11 +23,11 @@ class Module(object):
             return (self.bias), (self.grad_bias)
 
     @abc.abstractmethod
-    def update_output(self, _input):
+    def update_output(self, _input=None):
         return self.output
 
-    def forward(self, ipnut):
-        return self.update_output()
+    def forward(self, ipnut=None):
+        return self.update_output(ipnut)
 
     def backward(self, _input, grad_output, scale=1):
         self.update_grad_input(_input, grad_output)
@@ -269,7 +269,7 @@ class Module(object):
             raise('check that you are sharing parameters and gradParameters')
         return p, g
 
-    def __call__(self, _input, grad_output):
+    def __call__(self, _input=None, grad_output=None):
         self.forward(_input)
         if self.grad_output:
             self.backward(_input, grad_output)
