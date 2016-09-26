@@ -1,8 +1,11 @@
 from container import Container
+import numpy as np
 
 
 class Sequential(Container):
+
     """docstring for Sequential"""
+
     def __init__(self):
         super(Sequential, self).__init__()
 
@@ -22,7 +25,7 @@ class Sequential(Container):
             raise('index should be contiguous to existing modules')
         self.modules.insert(module, index)
         self.output = self.modules[len(self.modules)].output
-        self.grad_input = self.modules[0].grad_input ## 1??
+        self.grad_input = self.modules[0].grad_input  # 1??
 
     def remove(self, index):
         if index > len(self.modules) or index < 1:
@@ -32,21 +35,23 @@ class Sequential(Container):
             self.output = self.modules[len(self.modules)].output
             self.grad_input = self.modules[0].grad_input
         else:
-            self.output = mp.ndarray()
-            self.grad_input = mp.ndarray()
+            self.output = np.ndarray()
+            self.grad_input = np.ndarray()
 
     def update_output(self, x):
         current_output = x
         for i in xrange(len(self.modules)):
-            current_output = self.rethrow_errors(self.modules[i], i, 'update_output', current_output)
+            current_output = self.rethrow_errors(
+                self.modules[i], i, 'update_output', current_output)
         self.output = current_output
         return self.output
 
     def update_grad_input(self, grad_output):
         current_grad_output = grad_output
         current_module = self.modules[len(self.modules)]
-        for i in range(len())# reverse cicle
-
+        for i in range(len()):
+            import pdb
+            pdb.set_trace()   # reverse cicle
 
     def acc_grad_parameters(self, grad_output, scale):
         pass

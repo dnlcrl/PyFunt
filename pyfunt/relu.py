@@ -1,5 +1,6 @@
-local ReLU, Parent = torch.class('nn.ReLU', 'nn.Threshold')
+from threshold import Threshold
 
-function ReLU:__init(p)
-   Parent.__init(self,0,0,p)
-end
+
+class ReLU(Threshold):
+    def __init__(self, p):
+        super(Relu, self).__init__(self, 0, 0, p)
