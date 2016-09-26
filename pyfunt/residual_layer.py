@@ -7,12 +7,12 @@ from relu import ReLU
 from c_add_table import CAddTable
 
 
-def residual_layer(n_channels, n_out_channels=None, stride=None):
+def add_residual_layer(module, n_channels, n_out_channels=None, stride=None):
     n_out_channels = n_out_channels or n_channels
     stride = stride or 1
 
-    convs = Sequential()
-    add = convs.add
+    add = module.add
+    add(Sequential())
     add.SpatialConvolution(
         n_channels, n_out_channels, 3, 3, stride, stride, 1, 1)
     add.SpatialBatchNormalization(n_out_channels)
@@ -29,5 +29,4 @@ def residual_layer(n_channels, n_out_channels=None, stride=None):
 
     add(SpatialBatchNormalization(n_out_channels))
     layer = CAddTable()#net, skip
-    layer.add(ReLU(True))
-    return layer
+    add(ReLU(True))
