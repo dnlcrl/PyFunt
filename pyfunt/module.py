@@ -10,24 +10,25 @@ from types import DictType
 class Module(object):
 
     def __init__(self):
-        self.grad_input = np.ndarray()
-        self.output = np.ndarray()
-        self._type = self.output.type
+        self.grad_input = None #np.ndarray()
+        self.output = None #np.ndarray()
+        self._type = np.float
 
     def parameters(self):
-        if self.weight and self.bias:
-            return (self.weight, self.bias), (self.grad_weight, self.grad_bias)
-        if self.weight:
-            return (self.weight), (self.grad_weight)
-        if self.bias:
-            return (self.bias), (self.grad_bias)
+        if hasattr(self, 'weight'):
+            if self.weight is not None and self.bias is not None:
+                return (self.weight, self.bias), (self.grad_weight, self.grad_bias)
+            if self.weight is not None:
+                return (self.weight), (self.grad_weight)
+            if self.bias is not None:
+                return (self.bias), (self.grad_bias)
 
     @abc.abstractmethod
     def update_output(self, _input=None):
         return self.output
 
-    def forward(self, ipnut=None):
-        return self.update_output(ipnut)
+    def forward(self, x=None):
+        return self.update_output(x)
 
     def backward(self, _input, grad_output, scale=1):
         self.update_grad_input(_input, grad_output)
@@ -72,10 +73,11 @@ class Module(object):
                 g.zero()
 
     def update_parameters(self, lr):
-        params, grad_params = self.parameters()
-        if params:
+        res = self.parameters()
+        if res:
+            params, grad_params = res
             for i, p in enumerate(params):
-                p.add(-lr, grad_params[i])
+                p -= lr*grad_params[i]
 
     def training(self):
         self.train = True

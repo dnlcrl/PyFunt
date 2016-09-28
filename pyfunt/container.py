@@ -1,11 +1,13 @@
 from module import Module
 from types import DictType
-
+import sys
+import traceback
 
 class Container(Module):
     """docstring for Container"""
     def __init__(self):
         super(Container, self).__init__()
+        self.modules = []
 
     def add(self, module):
         self.modules.update(module)
@@ -17,8 +19,22 @@ class Container(Module):
     def size(self):
         return len(self.modules)
 
+    def rethrow_errors(self, module, module_index, func_name, *args):
+        def handle_error(err):
+            # TODO
+            return err
+        func = getattr(module, func_name)
+        try:
+            result = func(*args)
+        except Exception as e:
+            print 'In %d module (%s) of %s:' % (module_index, type(module).__name__, type(self).__name__)
+            traceback.print_exc()
+            raise e
+
+        return result
+
     def apply_to_modules(self, func):
-        for module in self.modules.values:
+        for module in self.modules:
             func(module)
 
     def zero_grad_parameters(self):

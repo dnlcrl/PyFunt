@@ -11,6 +11,9 @@ import sys
 from tqdm import tqdm
 
 
+import pdb
+
+
 def _pickle_method(method):
     '''
     Helper for multiprocessing ops, for more infos, check answer and comments
@@ -174,8 +177,13 @@ class Solver(object):
             self.y_val = data['y_val']
 
         # Unpack keyword arguments
+        self.criterion = kwargs.pop('criterion', None)
+        if self.criterion is None:
+            pdb.set_trace()
+
         self.update_rule = kwargs.pop('update_rule', 'sgd')
         self.optim_config = kwargs.pop('optim_config', {})
+        self.learning_rate = self.optim_config['learning_rate']
         self.lr_decay = kwargs.pop('lr_decay', 1.0)
         self.batch_size = kwargs.pop('batch_size', 100)
         self.num_epochs = kwargs.pop('num_epochs', 10)
@@ -238,9 +246,9 @@ class Solver(object):
 
         # Make a deep copy of the optim_config for each parameter
         self.optim_configs = {}
-        for p in self.model.params:
-            d = {k: v for k, v in self.optim_config.iteritems()}
-            self.optim_configs[p] = d
+        #for p in self.model.params:
+         #   d = {k: v for k, v in self.optim_config.iteritems()}
+         #   self.optim_configs[p] = d
 
         self.multiprocessing = bool(self.num_processes-1)
         if self.multiprocessing:
@@ -318,6 +326,26 @@ class Solver(object):
         np.save(path + 'val_acc_history', self.val_acc_history)
 
     def _step(self):
+        '''
+        Make a single gradient update. This is called by train() and should not
+        be called manually.
+        '''
+        # Make a minibatch of training data
+        num_train = self.X_train.shape[0]
+        batch_mask = np.random.choice(num_train, self.batch_size)
+        X_batch = self.X_train[batch_mask]
+        y_batch = self.y_train[batch_mask]
+
+        model = self.model
+        pred = model.forward(X_batch)
+        loss = self.criterion.forward(pred, y_batch)
+        self.loss_history.append(loss)
+        # mlp:zeroGradParameters()
+        t = self.criterion.backward(pred, y_batch)
+        dx = model.backward(X_batch, t)
+        model.update_parameters(self.learning_rate)
+
+    def _step_old(self):
         '''
         Make a single gradient update. This is called by train() and should not
         be called manually.
@@ -414,7 +442,9 @@ class Solver(object):
             end = (i + 1) * batch_size
 
             if not self.multiprocessing:
-                scores = self.model.loss(X[start:end])
+                pred = self.model.forward(X[start:end])
+                scores = self.criterion.forward(pred, y[start:end])
+                # scores = self.model.loss(X[start:end])
                 y_pred.append(np.argmax(scores, axis=1))
             else:
                 X_subs = np.split(X[start:end], self.num_processes)
@@ -443,25 +473,32 @@ class Solver(object):
         '''
         if self.acc_check_train_pre_process:
             X_tr_check = self.acc_check_train_pre_process(self.X_train[:1000])
+        else:
+            X_tr_check = self.X_train[:1000]
         if self.acc_check_val_pre_process:
             X_val_check = self.acc_check_val_pre_process(self.X_val)
+        else:
+            X_val_check = self.X_val
 
-        train_acc = self.check_accuracy(
-            X_tr_check, self.y_train[:1000])
-        val_acc = self.check_accuracy(X_val_check, self.y_val)
-        self.train_acc_history.append(train_acc)
-        self.val_acc_history.append(val_acc)
+        # train_acc = self.check_accuracy(
+        #     X_tr_check, self.y_train[:1000])
+        # val_acc = self.check_accuracy(X_val_check, self.y_val)
+        # self.train_acc_history.append(train_acc)
+        # self.val_acc_history.append(val_acc)
 
-        self.emit_sound()
+        #self.emit_sound()
         # Keep track of the best model
+        val_acc = 0
         if val_acc > self.best_val_acc:
             self.best_val_acc = val_acc
             self.best_params = {}
             for k, v in self.model.params.iteritems():
                 self.best_params[k] = v.copy()
         loss = '%.4f' % self.loss_history[it-1] if it > 0 else '-'
-        print '%s - iteration %d: loss:%s, train_acc: %.4f, val_acc: %.4f, best_val_acc: %.4f;\n' % (
-            str(datetime.now()), it, loss, train_acc, val_acc, self.best_val_acc)
+        print '%s - iteration %d: loss:%s, train_acc:-, val_acc: %.4f, best_val_acc: %.4f;\n' % (
+        # print '%s - iteration %d: loss:%s, train_acc: %.4f, val_acc: %.4f, best_val_acc: %.4f;\n' % (
+            str(datetime.now()), it, loss, val_acc, self.best_val_acc)
+            # str(datetime.now()), it, loss, train_acc, val_acc, self.best_val_acc)
 
     def _new_training_bar(self, total):
         '''

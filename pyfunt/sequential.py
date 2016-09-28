@@ -15,7 +15,7 @@ class Sequential(Container):
     def add(self,  module):
         if len(self.modules) == 0:
             self.grad_input = module.grad_input
-        self.modules.insert(module)
+        self.modules.append(module)
         self.output = module.output
         return self
 
@@ -60,4 +60,4 @@ class Sequential(Container):
         pass
 
     def __str__(self):
-        pass
+        return 'temporary string for Sequential class'

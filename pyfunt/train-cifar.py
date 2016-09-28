@@ -7,11 +7,13 @@ import numpy as np
 from pydatset.cifar10 import get_CIFAR10_data
 from pydatset.data_augmentation import (random_flips,
                                         random_crops)
-from res-net import ResNet
-from pyfunt.solver import Solver as Solver
+from resnet import ResNet
+from solver import Solver as Solver
 
 import inspect
 import argparse
+
+from class_nll_criterion import ClassNLLCriterion
 
 np.random.seed(0)
 
@@ -202,15 +204,16 @@ def main():
     bs = args.batch_size
     num_p = args.n_processes
     cp = args.checkpoint_every
-
+    criterion = ClassNLLCriterion()
     solver = Solver(model, data, args.load_checkpoint,
+                    criterion=criterion,
                     num_epochs=epochs, batch_size=bs,  # 20
                     update_rule='sgd_th',
                     optim_config=optim_config,
                     custom_update_ld=custom_update_decay,
                     batch_augment_func=data_augm,
-                    checkpoint_every=cp,
-                    num_processes=num_p)
+                    checkpoint_every=0,
+                    num_processes=1)
 
     print_infos(solver)
     solver.train()

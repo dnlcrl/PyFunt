@@ -7,8 +7,8 @@ def configuration(parent_package='', top_path=None):
 
     config = Configuration('layers', parent_package, top_path)
 
-    config.add_extension('im2col_cython',
-                         sources=[('im2col_cython.c')],
+    config.add_extension('im2col',
+                         sources=[('im2col.c')],
                          include_dirs=[get_numpy_include_dirs()])
 
     return config

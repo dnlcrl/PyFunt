@@ -4,7 +4,7 @@
 from module import Module
 import numpy as np
 try:
-    from layers.im2col_cython import col2im_6d_cython
+    from im2col_cyt import col2im_6d_cython
 except ImportError:
     print 'Installation broken, please reinstall PyFunt'
 
@@ -26,9 +26,9 @@ class SpatialConvolution(Module):
         self.padW = padW
         self.padH = padH or self.padW
 
-        self.weight = np.ndarray(n_output_plane, n_input_plane, kH, kW)
+        self.weight = np.ndarray((n_output_plane, n_input_plane, kH, kW))
         self.bias = np.ndarray(n_output_plane)
-        self.grad_weight = np.ndarray(n_output_plane, n_input_plane, kH, kW)
+        self.grad_weight = np.ndarray((n_output_plane, n_input_plane, kH, kW))
         self.grad_bias = np.ndarray(n_output_plane)
 
         self.reset()
@@ -40,8 +40,8 @@ class SpatialConvolution(Module):
     def reset(self, stdv=None):
         if not stdv:
             stdv = 1/np.sqrt(self.kW*self.kH*self.n_input_plane)
-        self.weight = np.normal(
-            stdv, self.n_output_plane, self.n_input_plane, self.kH, self.kW)
+        self.weight = np.random.normal(
+            0, stdv, (self.n_output_plane, self.n_input_plane, self.kH, self.kW))
         self.bias = np.zeros(self.n_output_plane)
 
     def check_input_dim(self, x):
@@ -57,16 +57,25 @@ class SpatialConvolution(Module):
 
         F, _, HH, WW = w.shape
         stride, pad = self.dW, self.padW
-
-        assert (W + 2 * pad - WW) % stride == 0, 'width does not work'
-        assert (H + 2 * pad - HH) % stride == 0, 'height does not work'
+        #assert (W + 2 * pad - WW) % stride == 0, 'width does not work'
+        #assert (H + 2 * pad - HH) % stride == 0, 'height does not work'
 
         p = pad
         x_padded = np.pad(
             x, ((0, 0), (0, 0), (p, p), (p, p)), mode='constant')
 
-        H += 2 * pad
-        W += 2 * pad
+        self.tiles_w = (W + 2 * pad - WW) % stride
+        self.tiles_h = (H + 2 * pad - HH) % stride
+        if not self.tiles_w == 0:
+            x_padded = x_padded[:, :, :-self.tiles_w, :]
+        if not self.tiles_h == 0:
+            x_padded = x_padded[:, :, :, :-self.tiles_h]
+
+        N, C, H, W = x_padded.shape
+        assert (W + 2 * pad - WW) % stride == 0, 'width does not work'
+
+        # H += 2 * pad
+        # W += 2 * pad
         out_h = (H - HH) / stride + 1
         out_w = (W - WW) / stride + 1
 

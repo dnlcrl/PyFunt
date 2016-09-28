@@ -2,7 +2,7 @@ from module import Module
 import numpy as np
 
 try:
-    from layers.im2col_cython import im2col_cython, col2im_cython
+    from im2col_cyt import im2col_cython, col2im_cython
 except ImportError:
     print 'Installation broken, please reinstall PyFunt'
 
@@ -11,7 +11,7 @@ class SpatialAveragePooling(Module):
 
     """docstring for SpatialAveragePooling"""
 
-    def __init__(self, kW, kH, dW, dH, padW, padH):
+    def __init__(self, kW, kH, dW=1, dH=1, padW=0, padH=0):
         super(SpatialAveragePooling, self).__init__()
         self.kW = kW
         self.kH = kH

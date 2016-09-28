@@ -7,33 +7,48 @@ import numpy as np
 
 class BatchNormalization(Module):
 
-    def __init__(self, n_output, eps=1e-5, momentum=0.1, affine=False):
+    def __init__(self, n_output, eps=1e-5, momentum=0.1, affine=True):
         super(BatchNormalization, self).__init__()
         self.eps = eps
         self.momentum = momentum
         self.train = True
         self.running_mean = np.zeros(n_output)
         self.running_var = np.zeros(n_output)
+        n_dim = 2
         if affine:
             self.weight = np.ndarray(n_output)
             self.bias = np.ndarray(n_output)
             self.grad_weight = np.ndarray(n_output)
             self.grad_bias = np.ndarray(n_output)
             self.reset()
+        else:
+            self.weight = None
+            self.bias = None
+            self.grad_weight = None
+            self.grad_bias = None
 
     def reset(self):
-        if self.weight:
-            self.weight = np.uniform(len(self.weight))
-        if self.bias:
-            self.bias = np.zeros(len(self.weight))
-        self.running_mean = np.zeros(len(self.weight))
-        self.running_var = np.ones(len(self.weight))
+        if self.weight is not None:
+            self.weight = np.random.uniform(len(self.weight))
+        if self.bias is not None:
+            self.bias = np.zeros(len(self.bias))
+        self.running_mean = np.zeros(len(self.running_mean))
+        self.running_var = np.ones(len(self.running_var))
 
-    def check_input_dim(self):
+    def check_input_dim(self, x):
+        i_dim = len(x.shape)
+        if i_dim != self.n_dim or (i_dim != self.n_dim - 1 and self.train is not False):
+            raise('TODO ERROR :(')
+        # feast_dim = (i_dim == self.n_dim -1) and 1 or 2
+        #      local featDim = (iDim == self.nDim - 1) and 1 or 2
+        # assert(input:size(featDim) == self.running_mean:nElement(), string.format(
+        #    'got %d-feature tensor, expected %d',
+   #    input:size(featDim), self.running_mean:nElement()))
+
+    def make_contigous(self, x, grad_output):
+        #TODO
         pass
 
-    def make_contigous(self):
-        pass
 
     def update_output(self, x):
 
@@ -60,7 +75,8 @@ class BatchNormalization(Module):
 
             unbiased_var = np.sum(carre, axis=0)/(N - 1.)
 
-            running_var = momentum * unbiased_var + (1. - momentum) * running_var
+            running_var = momentum * unbiased_var + \
+                (1. - momentum) * running_var
 
             self.xmu = xmu
             self.invstd = invstd
@@ -69,7 +85,12 @@ class BatchNormalization(Module):
             mean = running_mean
             invstd = 1. / np.sqrt(running_var + eps)
 
-        out = ((x - mean) * invstd) * self.weight + self.bias
+        out = ((x - mean) * invstd)
+        if self.weight is not None:
+            out *= self.weight
+        if self.bias is not None:
+            out += self.bias
+        #out = ((x - mean) * invstd) * self.weight + self.bias
         # Store the updated running means back into bn_param
         self.running_mean = np.array(running_mean, copy=True)
         self.running_var = np.array(running_var, copy=True)
@@ -95,6 +116,7 @@ class BatchNormalization(Module):
         self.grad_weight = dotp * invstd
 
         self.grad_bias = _sum
+        self.grad_input = dx
 
         return dx, self.grad_weight, self.grad_bias
 

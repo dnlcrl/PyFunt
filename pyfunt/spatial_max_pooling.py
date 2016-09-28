@@ -1,7 +1,7 @@
 from module import Module
 import numpy as np
 try:
-    from layers.im2col_cython import im2col_cython, col2im_cython
+    from im2col_cython import im2col_cython, col2im_cython
 except ImportError:
     print 'Installation broken, please reinstall PyFunt'
 
