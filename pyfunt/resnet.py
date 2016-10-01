@@ -15,26 +15,27 @@ from class_nll_criterion import ClassNLLCriterion
 
 def ResNet(n_size, num_starting_filters, reg):
 
+    nfs = num_starting_filters
     model = Sequential()
     add = model.add
-    add(SpatialConvolution(3, 16, 3, 3, 1, 1, 1, 1))
-    add(SpatialBatchNormalization(16))
+    add(SpatialConvolution(3, nfs, 3, 3, 1, 1, 1, 1))
+    add(SpatialBatchNormalization(nfs))
     add(ReLU(True))
 
     for i in xrange(1, n_size):
-        add(make_residual_layer(16))
-    add(make_residual_layer(16, 32, 2))
+        add(make_residual_layer(nfs))
+    add(make_residual_layer(nfs, 2*nfs, 2))
 
     for i in xrange(1, n_size-1):
-        add(make_residual_layer(32))
-    add(make_residual_layer(32, 64, 2))
+        add(make_residual_layer(2*nfs))
+    add(make_residual_layer(2*nfs, 4*nfs, 2))
 
     for i in xrange(1, n_size-1):
-        add(make_residual_layer(64))
+        add(make_residual_layer(4*nfs))
 
     add(SpatialAveragePooling(8, 8))
-    add(Reshape(64))
-    add(Linear(64, 10))
+    add(Reshape(nfs*4))
+    add(Linear(nfs*4, 10))
     add(LogSoftMax())
     return model
 

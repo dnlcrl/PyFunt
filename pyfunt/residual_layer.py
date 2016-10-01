@@ -16,7 +16,7 @@ def make_residual_layer(n_channels, n_out_channels=None, stride=None):
     add = module.add
     add(SpatialConvolution(
         n_channels, n_out_channels, 3, 3, stride, stride, 1, 1))
-    add(SpatialBatchNormalization(n_out_channels))
+    #add(SpatialBatchNormalization(n_out_channels))
     add(SpatialConvolution(n_out_channels, n_out_channels, 3, 3, 1, 1, 1, 1))
 
     skip = Sequential()
@@ -28,7 +28,7 @@ def make_residual_layer(n_channels, n_out_channels=None, stride=None):
     # elif n_out_channels < n_channels:
     #     skip =  skip.add(Narrow)
 
-    add(SpatialBatchNormalization(n_out_channels))
+    #add(SpatialBatchNormalization(n_out_channels))
     cat = ConcatTable()
     #net.add(cat)
     #cat.add()

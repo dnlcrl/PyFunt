@@ -18,10 +18,10 @@ class SpatialBatchNormalization(BatchNormalization):
         self.output = self.output.reshape(N, H, W, C).transpose(0, 3, 1, 2)
         return self.output
 
-    def backward(self, x, grad_output, scale, grad_input, grad_weight=None, grad_bias=None):
+    def update_grad_input(self, x, grad_output, scale=1):
         N, C, H, W = grad_output.shape
         dout_flat = grad_output.transpose(0, 2, 3, 1).reshape(-1, C)
         dout_flat = np.ascontiguousarray(dout_flat, dtype=dout_flat.dtype)
-        super(SpatialBatchNormalization, self).backward(x, dout_flat, scale, grad_input, grad_weight, grad_bias)
+        super(SpatialBatchNormalization, self).update_grad_input(x, dout_flat, scale)
         self.grad_input = self.grad_input.reshape(N, H, W, C).transpose(0, 3, 1, 2)
-        return self.grad_input, self.grad_weight, self.grad_bias
+        return self.grad_input

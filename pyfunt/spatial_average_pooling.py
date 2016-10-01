@@ -45,8 +45,8 @@ class SpatialAveragePooling(Module):
         assert (
             W - pool_width) % stride == 0 or W == pool_width, 'Invalid width'
 
-        out_height = np.floor((H - pool_height) / stride + 1)
-        out_width = np.floor((W - pool_width) / stride + 1)
+        out_height = int(np.floor((H - pool_height) / stride + 1))
+        out_width = int(np.floor((W - pool_width) / stride + 1))
 
         x_split = x.reshape(N * C, 1, H, W)
         x_cols = im2col_cython(
@@ -60,7 +60,7 @@ class SpatialAveragePooling(Module):
         self.output = out
         return self.output
 
-    def update_update_grad_inpu(self, x, grad_output):
+    def update_grad_input(self, x, grad_output):
         x_cols = self.x_cols
         dout = grad_output
         N, C, H, W = self.x_shape

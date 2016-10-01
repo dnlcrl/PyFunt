@@ -13,7 +13,7 @@ class SpatialConvolution(Module):
 
     n_dim = 2
 
-    def __init__(self, n_input_plane, n_output_plane, kW, kH, dW=1, dH=1, padW=0, padH=None):
+    def __init__(self, n_input_plane, n_output_plane, kW, kH, dW=1, dH=1, padW=0, padH=0):
         super(SpatialConvolution, self).__init__()
 
         self.n_input_plane = n_input_plane
@@ -99,7 +99,7 @@ class SpatialConvolution(Module):
         self.x_cols = x_cols
         return self.output
 
-    def update_grad_input(self, input, grad_output, scale):
+    def update_grad_input(self, input, grad_output, scale=1):
         x_shape, x_cols = self.x_shape, self.x_cols
         w = self.weight
 
@@ -117,7 +117,7 @@ class SpatialConvolution(Module):
         dx_cols = w.reshape(F, -1).T.dot(dout_reshaped)
         dx_cols.shape = (C, HH, WW, N, out_h, out_w)
         dx = col2im_6d_cython(dx_cols, N, C, H, W, HH, WW, pad, stride)
-
+        self.grad_input = dx
         return dx
 
     def type(self, type, cache):

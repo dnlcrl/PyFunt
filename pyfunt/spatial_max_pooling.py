@@ -1,7 +1,7 @@
 from module import Module
 import numpy as np
 try:
-    from im2col_cython import im2col_cython, col2im_cython
+    from im2col_cyt import im2col_cython, col2im_cython
 except ImportError:
     print 'Installation broken, please reinstall PyFunt'
 
@@ -10,7 +10,7 @@ class SpatialMaxPooling(Module):
 
     """docstring for SpatialMaxPooling"""
 
-    def __init__(self, kW, kH, dW, dH, padW, padH):
+    def __init__(self, kW, kH, dW=1, dH=1, padW=0, padH=0):
         super(SpatialMaxPooling, self).__init__()
         self.kW = kW
         self.kH = kH
@@ -59,7 +59,7 @@ class SpatialMaxPooling(Module):
         self.output = out
         return self.output
 
-    def update_update_grad_input(self, x, grad_output):
+    def update_grad_input(self, x, grad_output):
         x_cols = self.x_cols
         x_cols_argmax = self.x_cols_argmax
         dout = grad_output

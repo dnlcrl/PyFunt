@@ -29,7 +29,7 @@ class BatchNormalization(Module):
 
     def reset(self):
         if self.weight is not None:
-            self.weight = np.random.uniform(len(self.weight))
+            self.weight = np.random.uniform(size=len(self.weight))
         if self.bias is not None:
             self.bias = np.zeros(len(self.bias))
         self.running_mean = np.zeros(len(self.running_mean))
@@ -98,7 +98,7 @@ class BatchNormalization(Module):
 
         return self.output
 
-    def backward(self, x, grad_output, scale, grad_input, grad_weight=None, grad_bias=None):
+    def update_grad_input(self, x, grad_output, scale=1):
 
         xmu, invstd = self.xmu, self.invstd
 
@@ -118,10 +118,10 @@ class BatchNormalization(Module):
         self.grad_bias = _sum
         self.grad_input = dx
 
-        return dx, self.grad_weight, self.grad_bias
+        return self.grad_input
 
-    def update_grad_input(self, x, grad_output):
-        return self.backward(x, grad_output, 1, self.grad_input)
+    def backward(self, x, grad_output):
+        return self.update_grad_input(x, grad_output, 1)
 
     def acc_grad_input(self, x, grad_output, scale):
         return self.backward(x, grad_output, scale, None, self.grad_weight, self.grad_bias)

@@ -36,16 +36,19 @@ class ClassNLLCriterion(Criterion):
         # # self.output = -x
         # # return loss
 
-        N = x.shape[0]
-        xdev = x - x.max(1, keepdims=True)
-        self.logp = xdev - np.log(np.sum(np.exp(xdev), axis=1, keepdims=True))
-        loss = -np.mean(self.logp[np.arange(N), target])
-        self.output = loss
+        # N = x.shape[0]
+        # xdev = x - x.max(1, keepdims=True)
+        # self.logp = xdev - np.log(np.sum(np.exp(xdev), axis=1, keepdims=True))
+        # loss = -np.mean(self.logp[np.arange(N), target])
+        # self.output = loss
+        # import pdb; pdb.set_trace()
+        # return self.output
+        self.output = - np.mean(x[np.arange(x.shape[0]), target])
+        return self.output
 
     def update_grad_input(self, x, target):
         N = x.shape[0]
-        dx = np.exp(self.logp)
+        dx = np.exp(x)
         dx[np.arange(N), target] -= 1
-        dx /= N
         self.grad_input = dx
         return self.grad_input

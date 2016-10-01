@@ -2,6 +2,7 @@ from module import Module
 from types import DictType
 import sys
 import traceback
+import numpy as np
 
 class Container(Module):
     """docstring for Container"""
@@ -10,7 +11,7 @@ class Container(Module):
         self.modules = []
 
     def add(self, module):
-        self.modules.update(module)
+        self.modules.append(module)
         return self
 
     def get(self, index):
@@ -59,17 +60,19 @@ class Container(Module):
 
     def parameters(self):
         def tinsert(to, _from):
-            if type(_from) == DictType:
+            if isinstance(_from, list):
                 for i in xrange(len(_from)):
                     tinsert(to, _from[i])
             else:
-                to.update(_from)
+                to.append(_from)
 
-        w = {}
-        gw = {}
+        w = []
+        gw = []
         for i in xrange(len(self.modules)):
-            mw, mgw = self.modules[i].parameters()
-            if mw:
+
+            res = self.modules[i].parameters()
+            if res:
+                mw, mgw = res
                 tinsert(w, mw)
                 tinsert(gw, mgw)
         return w, gw

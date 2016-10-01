@@ -34,14 +34,14 @@ while not path_set:
 EXPERIMENT_PATH = '../Experiments/' + str(uuid.uuid4())[-10:]
 
 # residual network constants
-NSIZE = 3
-N_STARTING_FILTERS = 16
+NSIZE = 1
+N_STARTING_FILTERS = 8
 
 # solver constants
 NUM_PROCESSES = 4
 
-NUM_TRAIN = 50000
-NUM_TEST = 10000
+NUM_TRAIN = 500
+NUM_TEST = 100
 
 WEIGHT_DEACY = 1e-4
 REGULARIZATION = 0

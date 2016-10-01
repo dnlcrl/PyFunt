@@ -39,8 +39,12 @@ class Linear(Module):
         self.output = out
         return self.output
 
-    def updaet_grad_input(self, grad_output):
-        pass
+    def update_grad_input(self, x, grad_output):
+        dx = grad_output.dot(self.weight.T).reshape(x.shape)
+        self.grad_weight = x.reshape(x.shape[0], -1).T.dot(grad_output)
+        self.grad_bias = np.sum(grad_output, axis=0)
+        self.grad_input = dx
+        return dx
 
     def acc_grad_parameters(self, grad_output, scale=None):
         pass

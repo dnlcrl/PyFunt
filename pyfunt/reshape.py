@@ -17,4 +17,3 @@ class Reshape(Module):
     def upgrade_grad_input(self, x, grad_output):
         self.grad_input = grad_output.reshape(x.shape)
         return self.grad_input
-

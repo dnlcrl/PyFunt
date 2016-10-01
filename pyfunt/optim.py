@@ -57,7 +57,7 @@ def sgd_th(w, dw, config=None):
     assert (not nesterov or (momentum > 0 and dampening == 0)
             ), 'Nesterov momentum requires a momentum and zero dampening'
     dampening = dampening or momentum
-    dw = np.array(dw, copy=True)
+    dw = dw.copy()
     if weight_decay:
         dw += weight_decay * w
 

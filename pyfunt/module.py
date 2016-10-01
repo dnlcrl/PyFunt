@@ -10,18 +10,18 @@ from types import DictType
 class Module(object):
 
     def __init__(self):
-        self.grad_input = None #np.ndarray()
-        self.output = None #np.ndarray()
+        self.grad_input = None  # np.ndarray()
+        self.output = None  # np.ndarray()
         self._type = np.float
 
     def parameters(self):
         if hasattr(self, 'weight'):
             if self.weight is not None and self.bias is not None:
-                return (self.weight, self.bias), (self.grad_weight, self.grad_bias)
+                return [self.weight, self.bias], [self.grad_weight, self.grad_bias]
             if self.weight is not None:
-                return (self.weight), (self.grad_weight)
+                return [self.weight], [self.grad_weight]
             if self.bias is not None:
-                return (self.bias), (self.grad_bias)
+                return [self.bias], [self.grad_bias]
 
     @abc.abstractmethod
     def update_output(self, _input=None):
@@ -266,10 +266,10 @@ class Module(object):
 
     def get_parameters(self):
         parameters, grad_parameters = self.parameters()
-        p, g = Module.flatten(parameters), Module.flatten(grad_parameters)
-        if not p.n_element() == g.n_element():
-            raise('check that you are sharing parameters and gradParameters')
-        return p, g
+        #p, g = Module.flatten(parameters), Module.flatten(grad_parameters)
+        #if not p.n_element() == g.n_element():
+        #    raise('check that you are sharing parameters and gradParameters')
+        return parameters, grad_parameters
 
     def __call__(self, _input=None, grad_output=None):
         self.forward(_input)

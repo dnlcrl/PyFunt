@@ -246,9 +246,11 @@ class Solver(object):
 
         # Make a deep copy of the optim_config for each parameter
         self.optim_configs = {}
-        #for p in self.model.params:
-         #   d = {k: v for k, v in self.optim_config.iteritems()}
-         #   self.optim_configs[p] = d
+        self.params, self.grad_params = self.model.get_parameters()
+        # self.weights, _ = self.model.get_parameters()
+        for p in range(len(self.params)):
+            d = {k: v for k, v in self.optim_config.iteritems()}
+            self.optim_configs[p] = d
 
         self.multiprocessing = bool(self.num_processes-1)
         if self.multiprocessing:
@@ -342,67 +344,94 @@ class Solver(object):
         self.loss_history.append(loss)
         # mlp:zeroGradParameters()
         t = self.criterion.backward(pred, y_batch)
-        dx = model.backward(X_batch, t)
-        model.update_parameters(self.learning_rate)
+        model.backward(X_batch, t)
+        # model.update_parameters(self.learning_rate)
+        return loss, self.grad_params
 
-    def _step_old(self):
-        '''
-        Make a single gradient update. This is called by train() and should not
-        be called manually.
-        '''
-        # Make a minibatch of training data
-        num_train = self.X_train.shape[0]
-        n = self.num_processes
-        batch_mask = np.random.choice(num_train, self.batch_size)
-        X_batch = self.X_train[batch_mask]
-        y_batch = self.y_train[batch_mask]
+    def eval_model(self, X, y=None, num_samples=None, batch_size=100, return_preds=False):
+        N = X.shape[0]
+        batch_size = self.batch_size
+        num_batches = N / batch_size
+        if N % batch_size != 0:
+            num_batches += 1
+        y_pred1 = []
+        y_pred5 = []
+        for i in xrange(num_batches):
+            start = i * batch_size
+            end = (i + 1) * batch_size
 
-        if self.batch_augment_func:
-            X_batch = self.batch_augment_func(X_batch)
+            if not self.multiprocessing:
+                scores = self.model.forward(X[start:end])
+                #scores = self.criterion.forward(pred, y[start:end])
+                # scores = self.model.loss(X[start:end])
+                y_pred1.append(np.argmax(scores, axis=1))
+                y_pred5.append(scores.argsort()[-5:][::-1])
 
-        # Compute loss and gradient
-        if not self.multiprocessing:
-            loss, grads = self.model.loss(X_batch, y_batch)
-        else:
-            n = self.num_processes
-            pool = self.pool
+        y_pred1 = np.hstack(y_pred1)
+        if return_preds:
+            return y_pred1
+        acc1 = np.mean(y_pred1 == y)
+        acc5 = np.mean(np.any(y_pred5 == y))
+        return acc1, acc5
 
-            X_batches = np.split(X_batch, n)
-            sub_weights = np.array([len(x)
-                                    for x in X_batches], dtype=np.float32)
-            sub_weights /= sub_weights.sum()
+    # def _step_old(self):
+    #     '''
+    #     Make a single gradient update. This is called by train() and should not
+    #     be called manually.
+    #     '''
+    #     # Make a minibatch of training data
+    #     num_train = self.X_train.shape[0]
+    #     n = self.num_processes
+    #     batch_mask = np.random.choice(num_train, self.batch_size)
+    #     X_batch = self.X_train[batch_mask]
+    #     y_batch = self.y_train[batch_mask]
 
-            y_batches = np.split(y_batch, n)
-            try:
-                job_args = [(X_batches[i], y_batches[i]) for i in range(n)]
-                results = pool.map_async(
-                    self.model.loss_helper, job_args).get()
-                losses = np.zeros(len(results))
-                gradses = []
-                i = 0
-                for i, r in enumerate(results):
-                    l, g = r
-                    losses[i] = l
-                    gradses.append(g)
-                    i += 1
-            except Exception, e:
-                pool.terminate()
-                pool.join()
-                raise e
-            loss = np.mean(losses)
-            grads = {}
-            for p, w in self.model.params.iteritems():
-                grads[p] = np.mean([grad[p] for grad in gradses], axis=0)
+    #     if self.batch_augment_func:
+    #         X_batch = self.batch_augment_func(X_batch)
 
-        self.loss_history.append(loss)
+    #     # Compute loss and gradient
+    #     if not self.multiprocessing:
+    #         loss, grads = self.model.loss(X_batch, y_batch)
+    #     else:
+    #         n = self.num_processes
+    #         pool = self.pool
 
-        # Perform a parameter update
-        for p, w in self.model.params.iteritems():
-            dw = grads[p]
-            config = self.optim_configs[p]
-            next_w, next_config = self.update_rule(w, dw, config)
-            self.model.params[p] = next_w
-            self.optim_configs[p] = next_config
+    #         X_batches = np.split(X_batch, n)
+    #         sub_weights = np.array([len(x)
+    #                                 for x in X_batches], dtype=np.float32)
+    #         sub_weights /= sub_weights.sum()
+
+    #         y_batches = np.split(y_batch, n)
+    #         try:
+    #             job_args = [(X_batches[i], y_batches[i]) for i in range(n)]
+    #             results = pool.map_async(
+    #                 self.model.loss_helper, job_args).get()
+    #             losses = np.zeros(len(results))
+    #             gradses = []
+    #             i = 0
+    #             for i, r in enumerate(results):
+    #                 l, g = r
+    #                 losses[i] = l
+    #                 gradses.append(g)
+    #                 i += 1
+    #         except Exception, e:
+    #             pool.terminate()
+    #             pool.join()
+    #             raise e
+    #         loss = np.mean(losses)
+    #         grads = {}
+    #         for p, w in self.model.params.iteritems():
+    #             grads[p] = np.mean([grad[p] for grad in gradses], axis=0)
+
+    #     self.loss_history.append(loss)
+
+    #     # Perform a parameter update
+    #     for p, w in self.model.params.iteritems():
+    #         dw = grads[p]
+    #         config = self.optim_configs[p]
+    #         next_w, next_config = self.update_rule(w, dw, config)
+    #         self.model.params[p] = next_w
+    #         self.optim_configs[p] = next_config
 
     def check_accuracy(self, X, y=None, num_samples=None, batch_size=100, return_preds=False):
         '''
@@ -480,25 +509,28 @@ class Solver(object):
         else:
             X_val_check = self.X_val
 
-        # train_acc = self.check_accuracy(
-        #     X_tr_check, self.y_train[:1000])
+        train_acc, _ = self.eval_model(
+             X_tr_check, self.y_train[:1000])
+        val_acc, _ = self.eval_model(X_val_check, self.y_val)
         # val_acc = self.check_accuracy(X_val_check, self.y_val)
-        # self.train_acc_history.append(train_acc)
-        # self.val_acc_history.append(val_acc)
+        self.train_acc_history.append(train_acc)
+        self.val_acc_history.append(val_acc)
 
         #self.emit_sound()
         # Keep track of the best model
-        val_acc = 0
+        #val_acc = 0
         if val_acc > self.best_val_acc:
             self.best_val_acc = val_acc
-            self.best_params = {}
-            for k, v in self.model.params.iteritems():
-                self.best_params[k] = v.copy()
+            # self.best_params = {}
+            for p, w in enumerate(self.params):
+                self.best_params[p] = w.copy()
+            # for k, v in self.model.params.iteritems():
+                # self.best_params[k] = v.copy()
         loss = '%.4f' % self.loss_history[it-1] if it > 0 else '-'
-        print '%s - iteration %d: loss:%s, train_acc:-, val_acc: %.4f, best_val_acc: %.4f;\n' % (
+        print '%s - iteration %d: loss:%s, train_acc:%.4f, val_acc: %.4f, best_val_acc: %.4f;\n' % (
         # print '%s - iteration %d: loss:%s, train_acc: %.4f, val_acc: %.4f, best_val_acc: %.4f;\n' % (
-            str(datetime.now()), it, loss, val_acc, self.best_val_acc)
-            # str(datetime.now()), it, loss, train_acc, val_acc, self.best_val_acc)
+            # str(datetime.now()), it, loss, val_acc, self.best_val_acc)
+            str(datetime.now()), it, loss, train_acc, val_acc, self.best_val_acc)
 
     def _new_training_bar(self, total):
         '''
@@ -522,9 +554,23 @@ class Solver(object):
         lr_decay_updated = False
         self._check_and_swap()
         self._new_training_bar(images_per_epochs)
+        self.params, self.grad_params = self.model.get_parameters()
+        self.best_params = self.params
+        #self.weights, self.grads = self.model.get_parameters()
         for it in xrange(num_iterations):
 
-            self._step()
+            loss = self._step()
+
+            self.loss_history.append(loss)
+
+            # Perform a parameter update
+            for p, w in enumerate(self.params):  # self.model.params.iteritems():
+                dw = self.grad_params[p]
+                config = self.optim_configs[p]
+                next_w, next_config = self.update_rule(w, dw, config)
+                self.params[p][:] = next_w[:]
+                self.optim_configs[p] = next_config
+
             self.pbar.update(self.batch_size)
 
             epoch_end = (it + 1) % iterations_per_epoch == 0
@@ -553,6 +599,7 @@ class Solver(object):
                     self._new_training_bar(images_per_epochs)
 
         # At the end of training swap the best params into the model
+        import pdb; pdb.set_trace()
         self.model.params = self.best_params
         if self.multiprocessing:
             try:
