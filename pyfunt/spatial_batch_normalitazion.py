@@ -25,3 +25,6 @@ class SpatialBatchNormalization(BatchNormalization):
         super(SpatialBatchNormalization, self).update_grad_input(x, dout_flat, scale)
         self.grad_input = self.grad_input.reshape(N, H, W, C).transpose(0, 3, 1, 2)
         return self.grad_input
+
+    def backward(self, x, grad_output, scale=1):
+        return self.update_grad_input(x, grad_output, scale)

@@ -20,18 +20,18 @@ class BatchNormalization(Module):
             self.bias = np.ndarray(n_output)
             self.grad_weight = np.ndarray(n_output)
             self.grad_bias = np.ndarray(n_output)
-            self.reset()
         else:
             self.weight = None
             self.bias = None
             self.grad_weight = None
             self.grad_bias = None
+        self.reset()
 
     def reset(self):
         if self.weight is not None:
-            self.weight = np.random.uniform(size=len(self.weight))
+            self.weight[:] = np.random.uniform(size=len(self.weight))[:]
         if self.bias is not None:
-            self.bias = np.zeros(len(self.bias))
+            self.bias[:] = np.zeros(len(self.bias))[:]
         self.running_mean = np.zeros(len(self.running_mean))
         self.running_var = np.ones(len(self.running_var))
 
@@ -113,15 +113,15 @@ class BatchNormalization(Module):
         dmean = 1. / N * _sum
         dx = (grad_output - dmean - dx) * invstd * self.weight
 
-        self.grad_weight = dotp * invstd
+        self.grad_weight[:] = dotp * invstd
 
-        self.grad_bias = _sum
+        self.grad_bias[:] = _sum
         self.grad_input = dx
 
         return self.grad_input
 
-    def backward(self, x, grad_output):
-        return self.update_grad_input(x, grad_output, 1)
+    # def backward(self, x, grad_output, scale=1):
+    #     return self.update_grad_input(x, grad_output, scale)
 
     def acc_grad_input(self, x, grad_output, scale):
         return self.backward(x, grad_output, scale, None, self.grad_weight, self.grad_bias)

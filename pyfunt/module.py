@@ -8,6 +8,7 @@ from types import DictType
 
 
 class Module(object):
+    __metaclass__ = abc.ABCMeta
 
     def __init__(self):
         self.grad_input = None  # np.ndarray()
@@ -25,13 +26,14 @@ class Module(object):
 
     @abc.abstractmethod
     def update_output(self, _input=None):
-        return self.output
+        # return self.output
+        raise NotImplementedError()
 
     def forward(self, x=None):
         return self.update_output(x)
 
     def backward(self, _input, grad_output, scale=1):
-        self.update_grad_input(_input, grad_output)
+        self.grad_input = self.update_grad_input(_input, grad_output)
         self.acc_grad_parameters(_input, grad_output, scale)
         return self.grad_input
 
@@ -46,7 +48,8 @@ class Module(object):
 
     @abc.abstractmethod
     def update_grad_input(self, _input, grad_output):
-        return self.grad_input
+        # return self.grad_input
+        raise NotImplementedError()
 
     def acc_grad_parameters(self, _input, grad_output, scale):
         pass
@@ -125,7 +128,7 @@ class Module(object):
 
     @abc.abstractmethod
     def reset(self):
-        pass
+        raise NotImplementedError()
 
     def write(self, file):
         np.save(file, self)

@@ -3,6 +3,8 @@ from types import DictType
 import sys
 import traceback
 import numpy as np
+import abc
+
 
 class Container(Module):
     """docstring for Container"""

@@ -23,6 +23,10 @@ class SpatialAveragePooling(Module):
         self.count_include_pad = True
         self.divide = True
 
+    def reset(self):
+        #TODO
+        pass
+
     def ceil(self):
         self.ceil_mode = True
 
@@ -60,7 +64,7 @@ class SpatialAveragePooling(Module):
         self.output = out
         return self.output
 
-    def update_grad_input(self, x, grad_output):
+    def update_grad_input(self, x, grad_output, scale=1):
         x_cols = self.x_cols
         dout = grad_output
         N, C, H, W = self.x_shape

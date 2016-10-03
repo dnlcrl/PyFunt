@@ -6,7 +6,7 @@ from sequential import Sequential
 from padding import Padding
 from relu import ReLU
 from c_add_table import CAddTable
-from residual_layer import make_residual_layer
+from residual_layer import residual_layer
 from linear import Linear
 from reshape import Reshape
 from log_soft_max import LogSoftMax
@@ -20,18 +20,18 @@ def ResNet(n_size, num_starting_filters, reg):
     add = model.add
     add(SpatialConvolution(3, nfs, 3, 3, 1, 1, 1, 1))
     add(SpatialBatchNormalization(nfs))
-    add(ReLU(True))
+    add(ReLU())
 
     for i in xrange(1, n_size):
-        add(make_residual_layer(nfs))
-    add(make_residual_layer(nfs, 2*nfs, 2))
+        add(residual_layer(nfs))
+    add(residual_layer(nfs, 2*nfs, 2))
 
     for i in xrange(1, n_size-1):
-        add(make_residual_layer(2*nfs))
-    add(make_residual_layer(2*nfs, 4*nfs, 2))
+        add(residual_layer(2*nfs))
+    add(residual_layer(2*nfs, 4*nfs, 2))
 
     for i in xrange(1, n_size-1):
-        add(make_residual_layer(4*nfs))
+        add(residual_layer(4*nfs))
 
     add(SpatialAveragePooling(8, 8))
     add(Reshape(nfs*4))

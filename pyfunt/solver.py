@@ -343,8 +343,8 @@ class Solver(object):
         loss = self.criterion.forward(pred, y_batch)
         self.loss_history.append(loss)
         # mlp:zeroGradParameters()
-        t = self.criterion.backward(pred, y_batch)
-        model.backward(X_batch, t)
+        dout = self.criterion.backward(pred, y_batch)
+        model.backward(X_batch, dout)
         # model.update_parameters(self.learning_rate)
         return loss, self.grad_params
 

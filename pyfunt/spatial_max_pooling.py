@@ -59,7 +59,7 @@ class SpatialMaxPooling(Module):
         self.output = out
         return self.output
 
-    def update_grad_input(self, x, grad_output):
+    def update_grad_input(self, x, grad_output, scale=1):
         x_cols = self.x_cols
         x_cols_argmax = self.x_cols_argmax
         dout = grad_output
@@ -75,6 +75,9 @@ class SpatialMaxPooling(Module):
         dx = dx.reshape(self.x_shape)
         self.grad_input = dx
         return self.grad_input
+
+    def reset(self):
+        pass
 
     def __str__(self):
         pass

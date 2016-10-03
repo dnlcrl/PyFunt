@@ -109,10 +109,10 @@ class SpatialConvolution(Module):
         F, _, HH, WW = w.shape
         _, _, out_h, out_w = grad_output.shape
 
-        self.grad_bias = np.sum(grad_output, axis=(0, 2, 3))
+        self.grad_bias[:] = np.sum(grad_output, axis=(0, 2, 3))[:]
 
         dout_reshaped = grad_output.transpose(1, 0, 2, 3).reshape(F, -1)
-        self.grad_weight = dout_reshaped.dot(x_cols.T).reshape(w.shape)
+        self.grad_weight[:] = dout_reshaped.dot(x_cols.T).reshape(w.shape)[:]
 
         dx_cols = w.reshape(F, -1).T.dot(dout_reshaped)
         dx_cols.shape = (C, HH, WW, N, out_h, out_w)

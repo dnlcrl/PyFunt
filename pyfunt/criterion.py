@@ -1,11 +1,15 @@
 import numpy as np
+import abc
+
 
 class Criterion(object):
+    __metaclass__ = abc.ABCMeta
     """docstring for Criterion"""
     def __init__(self):
         super(Criterion, self).__init__()
         self.output = 0
 
+    @abc.abstractmethod
     def update_output(self, x, target):
         pass
 
@@ -13,8 +17,9 @@ class Criterion(object):
         return self.update_output(x, target)
 
     def backward(self, x, target):
-        self.update_grad_input(x, target)
+        return self.update_grad_input(x, target)
 
+    @abc.abstractmethod
     def update_grad_input(self, x, target):
         pass
 

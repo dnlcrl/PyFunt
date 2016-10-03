@@ -26,7 +26,7 @@ class ClassNLLCriterion(Criterion):
         else:
             return 0
 
-    def update_output(self, x, target=None):
+    def update_output(self, x, target):
 
         # probs=np.exp(scores - np.max(scores, axis=1, keepdims=True))
         # probs /= np.sum(probs, axis=1, keepdims=True)
@@ -43,6 +43,7 @@ class ClassNLLCriterion(Criterion):
         # self.output = loss
         # import pdb; pdb.set_trace()
         # return self.output
+
         self.output = - np.mean(x[np.arange(x.shape[0]), target])
         return self.output
 
@@ -50,5 +51,7 @@ class ClassNLLCriterion(Criterion):
         N = x.shape[0]
         dx = np.exp(x)
         dx[np.arange(N), target] -= 1
+        dx /= N
         self.grad_input = dx
+        #import pdb; pdb.set_trace()
         return self.grad_input

@@ -14,6 +14,9 @@ class Reshape(Module):
         self.output = x.reshape((x.shape[0],) + self.shape)
         return self.output
 
-    def upgrade_grad_input(self, x, grad_output):
+    def update_grad_input(self, x, grad_output):
         self.grad_input = grad_output.reshape(x.shape)
         return self.grad_input
+
+    def reset(self):
+        pass

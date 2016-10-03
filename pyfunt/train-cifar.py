@@ -15,9 +15,15 @@ import argparse
 
 from class_nll_criterion import ClassNLLCriterion
 
+import pdb
+import traceback
+
+
+np.seterr(all='raise')
+
 np.random.seed(0)
 
-DATA_PATH = 'CIFAR_DATASET_PATH'
+DATA_PATH = '../CIFAR_DATASET_PATH'
 
 path_set = False
 while not path_set:
@@ -35,13 +41,13 @@ EXPERIMENT_PATH = '../Experiments/' + str(uuid.uuid4())[-10:]
 
 # residual network constants
 NSIZE = 1
-N_STARTING_FILTERS = 8
+N_STARTING_FILTERS = 16
 
 # solver constants
 NUM_PROCESSES = 4
 
-NUM_TRAIN = 500
-NUM_TEST = 100
+NUM_TRAIN = 5000
+NUM_TEST = 1000
 
 WEIGHT_DEACY = 1e-4
 REGULARIZATION = 0

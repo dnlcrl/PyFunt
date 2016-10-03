@@ -7,11 +7,11 @@ class Identity(Module):
         super(Identity, self).__init__()
 
     def update_output(self, x):
-        self.output = x
+        self.output = x.copy()
         return self.output
 
     def update_grad_input(self, grad_output):
-        self.grad_input = grad_output
+        self.grad_input = grad_output.copy()
         return self.grad_input
 
     def clear_state(self):
