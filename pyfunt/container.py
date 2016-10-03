@@ -30,6 +30,7 @@ class Container(Module):
         try:
             result = func(*args)
         except Exception as e:
+            import pdb; pdb.set_trace()
             print 'In %d module (%s) of %s:' % (module_index, type(module).__name__, type(self).__name__)
             traceback.print_exc()
             raise e

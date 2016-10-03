@@ -40,7 +40,7 @@ while not path_set:
 EXPERIMENT_PATH = '../Experiments/' + str(uuid.uuid4())[-10:]
 
 # residual network constants
-NSIZE = 1
+NSIZE = 3
 N_STARTING_FILTERS = 16
 
 # solver constants
@@ -219,7 +219,7 @@ def main():
                     custom_update_ld=custom_update_decay,
                     batch_augment_func=data_augm,
                     checkpoint_every=0,
-                    num_processes=1)
+                    num_processes=num_p)
 
     print_infos(solver)
     solver.train()

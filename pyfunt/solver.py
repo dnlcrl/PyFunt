@@ -10,28 +10,26 @@ from types import MethodType
 import sys
 from tqdm import tqdm
 
-
 import pdb
 
 
 def _pickle_method(method):
-    '''
-    Helper for multiprocessing ops, for more infos, check answer and comments
-    here:
-    http://stackoverflow.com/a/1816969/1142814
-    '''
+    # Author: Steven Bethard
+    # http://bytes.com/topic/python/answers/552476-why-cant-you-pickle-instancemethods
     func_name = method.im_func.__name__
     obj = method.im_self
     cls = method.im_class
+    cls_name = ''
+    if func_name.startswith('__') and not func_name.endswith('__'):
+        cls_name = cls.__name__.lstrip('_')
+    if cls_name:
+        func_name = '_' + cls_name + func_name
     return _unpickle_method, (func_name, obj, cls)
 
 
 def _unpickle_method(func_name, obj, cls):
-    '''
-    Helper for multiprocessing ops, for more infos, check answer and comments
-    here:
-    http://stackoverflow.com/a/1816969/1142814
-    '''
+    # Author: Steven Bethard
+    # http://bytes.com/topic/python/answers/552476-why-cant-you-pickle-instancemethods
     for cls in cls.mro():
         try:
             func = cls.__dict__[func_name]
@@ -40,6 +38,38 @@ def _unpickle_method(func_name, obj, cls):
         else:
             break
     return func.__get__(obj, cls)
+
+
+def _loss_helper(solver, args):
+    return solver._loss_helper(args)
+
+
+# def _pickle_method(method):
+#     '''
+#     Helper for multiprocessing ops, for more infos, check answer and comments
+#     here:
+#     http://stackoverflow.com/a/1816969/1142814
+#     '''
+#     func_name = method.im_func.__name__
+#     obj = method.im_self
+#     cls = method.im_class
+#     return _unpickle_method, (func_name, obj, cls)
+
+
+# def _unpickle_method(func_name, obj, cls):
+#     '''
+#     Helper for multiprocessing ops, for more infos, check answer and comments
+#     here:
+#     http://stackoverflow.com/a/1816969/1142814
+#     '''
+#     for cls in cls.mro():
+#         try:
+#             func = cls.__dict__[func_name]
+#         except KeyError:
+#             pass
+#         else:
+#             break
+#     return func.__get__(obj, cls)
 
 
 def init_worker():
@@ -194,7 +224,8 @@ class Solver(object):
         self.custom_update_ld = kwargs.pop('custom_update_ld', False)
         self.acc_check_train_pre_process = kwargs.pop(
             'acc_check_train_pre_process', False)
-        self.acc_check_val_pre_process = kwargs.pop('acc_check_val_pre_process', False)
+        self.acc_check_val_pre_process = kwargs.pop(
+            'acc_check_val_pre_process', False)
         self.batch_augment_func = kwargs.pop('batch_augment_func', False)
         self.num_processes = kwargs.pop('num_processes', 1)
 
@@ -327,6 +358,14 @@ class Solver(object):
         np.save(path + 'train_acc_history', self.train_acc_history)
         np.save(path + 'val_acc_history', self.val_acc_history)
 
+    def _loss_helper(self, args):
+        x, y = args
+        preds = self.model.forward(x)
+        loss = self.criterion.forward(preds, y)
+        dout = self.criterion.backward(preds, y)
+        self.model.backward(x, dout)
+        return loss, self.grad_params
+
     def _step(self):
         '''
         Make a single gradient update. This is called by train() and should not
@@ -339,14 +378,48 @@ class Solver(object):
         y_batch = self.y_train[batch_mask]
 
         model = self.model
-        pred = model.forward(X_batch)
-        loss = self.criterion.forward(pred, y_batch)
+
+        if not self.multiprocessing:
+            # pred = model.forward(X_batch)
+            # loss = self.criterion.forward(pred, y_batch)
+            loss, grads = self._loss_helper((X_batch, y_batch))
+        else:
+            n = self.num_processes
+            pool = self.pool
+
+            X_batches = np.split(X_batch, n)
+            sub_weights = np.array([len(x)
+                                    for x in X_batches], dtype=np.float32)
+            sub_weights /= sub_weights.sum()
+
+            y_batches = np.split(y_batch, n)
+            try:
+                job_args = [(X_batches[i], y_batches[i]) for i in range(n)]
+                results = pool.map_async(
+                    _loss_helper, (self,job_args)).get()
+                losses = np.zeros(len(results))
+                gradses = []
+                i = 0
+                for i, r in enumerate(results):
+                    l, g = r
+                    losses[i] = l
+                    gradses.append(g)
+                    i += 1
+            except Exception, e:
+                self.pool.terminate()
+                self.pool.join()
+                raise e
+            loss = np.mean(losses)
+            grads = {}
+            for p, w in self.model.params.iteritems():
+                grads[p] = np.mean([grad[p] for grad in gradses], axis=0)
+
         self.loss_history.append(loss)
         # mlp:zeroGradParameters()
-        dout = self.criterion.backward(pred, y_batch)
-        model.backward(X_batch, dout)
+        #dout = self.criterion.backward(pred, y_batch)
+        #model.backward(X_batch, dout)
         # model.update_parameters(self.learning_rate)
-        return loss, self.grad_params
+        return loss, grads
 
     def eval_model(self, X, y=None, num_samples=None, batch_size=100, return_preds=False):
         N = X.shape[0]
@@ -356,17 +429,20 @@ class Solver(object):
             num_batches += 1
         y_pred1 = []
         y_pred5 = []
+        self.pbar = tqdm(total=N, desc='Accuracy Check', unit='im')
         for i in xrange(num_batches):
             start = i * batch_size
             end = (i + 1) * batch_size
 
-            if not self.multiprocessing:
-                scores = self.model.forward(X[start:end])
-                #scores = self.criterion.forward(pred, y[start:end])
-                # scores = self.model.loss(X[start:end])
-                y_pred1.append(np.argmax(scores, axis=1))
-                y_pred5.append(scores.argsort()[-5:][::-1])
+            # if not self.multiprocessing:
+            scores = self.model.forward(X[start:end])
+            #scores = self.criterion.forward(pred, y[start:end])
+            # scores = self.model.loss(X[start:end])
+            y_pred1.append(np.argmax(scores, axis=1))
+            y_pred5.append(scores.argsort()[-5:][::-1])
 
+            self.pbar.update(end - start)
+        print
         y_pred1 = np.hstack(y_pred1)
         if return_preds:
             return y_pred1
@@ -510,13 +586,13 @@ class Solver(object):
             X_val_check = self.X_val
 
         train_acc, _ = self.eval_model(
-             X_tr_check, self.y_train[:1000])
+            X_tr_check, self.y_train[:1000])
         val_acc, _ = self.eval_model(X_val_check, self.y_val)
         # val_acc = self.check_accuracy(X_val_check, self.y_val)
         self.train_acc_history.append(train_acc)
         self.val_acc_history.append(val_acc)
 
-        #self.emit_sound()
+        # self.emit_sound()
         # Keep track of the best model
         #val_acc = 0
         if val_acc > self.best_val_acc:
@@ -526,9 +602,10 @@ class Solver(object):
                 self.best_params[p] = w.copy()
             # for k, v in self.model.params.iteritems():
                 # self.best_params[k] = v.copy()
+
         loss = '%.4f' % self.loss_history[it-1] if it > 0 else '-'
         print '%s - iteration %d: loss:%s, train_acc:%.4f, val_acc: %.4f, best_val_acc: %.4f;\n' % (
-        # print '%s - iteration %d: loss:%s, train_acc: %.4f, val_acc: %.4f, best_val_acc: %.4f;\n' % (
+            # print '%s - iteration %d: loss:%s, train_acc: %.4f, val_acc: %.4f, best_val_acc: %.4f;\n' % (
             # str(datetime.now()), it, loss, val_acc, self.best_val_acc)
             str(datetime.now()), it, loss, train_acc, val_acc, self.best_val_acc)
 
@@ -559,12 +636,13 @@ class Solver(object):
         #self.weights, self.grads = self.model.get_parameters()
         for it in xrange(num_iterations):
 
-            loss = self._step()
+            loss, _ = self._step()
 
-            self.loss_history.append(loss)
+            # self.loss_history.append(loss)
 
             # Perform a parameter update
-            for p, w in enumerate(self.params):  # self.model.params.iteritems():
+            # self.model.params.iteritems():
+            for p, w in enumerate(self.params):
                 dw = self.grad_params[p]
                 config = self.optim_configs[p]
                 next_w, next_config = self.update_rule(w, dw, config)
@@ -599,7 +677,8 @@ class Solver(object):
                     self._new_training_bar(images_per_epochs)
 
         # At the end of training swap the best params into the model
-        import pdb; pdb.set_trace()
+        import pdb
+        pdb.set_trace()
         self.model.params = self.best_params
         if self.multiprocessing:
             try:

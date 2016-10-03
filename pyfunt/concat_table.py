@@ -24,10 +24,16 @@ class ConcatTable(Container):
             # self.modules[i], i, 'update_output', x))
         return self.output
 
-    def _backward(self, method, x, grad_output, scale):
+    def _backward(self, method, x, grad_output, scale=1):
         for i, module in enumerate(self.modules):
-            current_grad_input = self.rethrow_errors(
-                self.modules[i], i, method, x, grad_output[i], scale)
+            if method == 'update_grad_input':
+                args = self.modules[i], i, method, x, grad_output[i]
+            else:
+                args = self.modules[i], i, method, x, grad_output[i], scale
+            try:
+                current_grad_input = self.rethrow_errors(*args)
+            except:
+                import pdb; pdb.set_trace()
             if i == 0:
                 self.grad_input = current_grad_input
             else:
