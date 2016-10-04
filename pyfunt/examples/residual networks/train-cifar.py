@@ -7,17 +7,13 @@ import numpy as np
 from pydatset.cifar10 import get_CIFAR10_data
 from pydatset.data_augmentation import (random_flips,
                                         random_crops)
-from resnet import ResNet
-from solver import Solver as Solver
+from resnet import resnet
+from pyfunt.solver import Solver as Solver
 
 import inspect
 import argparse
 
-from class_nll_criterion import ClassNLLCriterion
-
-import pdb
-import traceback
-
+from pyfunt.class_nll_criterion import ClassNLLCriterion
 
 np.seterr(all='raise')
 
@@ -195,7 +191,7 @@ def main():
     nf = args.n_starting_filters
     reg = args.network_regularization
 
-    model = ResNet(n_size=args.n_size,
+    model = resnet(n_size=args.n_size,
                    num_starting_filters=nf,
                    reg=reg)
 
@@ -218,7 +214,7 @@ def main():
                     optim_config=optim_config,
                     custom_update_ld=custom_update_decay,
                     batch_augment_func=data_augm,
-                    checkpoint_every=0,
+                    checkpoint_every=cp,
                     num_processes=num_p)
 
     print_infos(solver)

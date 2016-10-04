@@ -391,8 +391,6 @@ class Solver(object):
         X_batch = self.X_train[batch_mask]
         y_batch = self.y_train[batch_mask]
 
-        model = self.model
-
         if not self.multiprocessing:
             # pred = model.forward(X_batch)
             # loss = self.criterion.forward(pred, y_batch)
@@ -481,7 +479,7 @@ class Solver(object):
                     raise e
 
             self.pbar.update(end - start)
-        print
+        print()
         y_pred1 = np.hstack(y_pred1)
         if return_preds:
             return y_pred1
@@ -513,7 +511,6 @@ class Solver(object):
 
         self.emit_sound()
         # Keep track of the best model
-        #val_acc = 0
         if val_acc > self.best_val_acc:
             self.best_val_acc = val_acc
             # self.best_params = {}
@@ -551,8 +548,8 @@ class Solver(object):
         lr_decay_updated = False
         self._check_and_swap()
         self._new_training_bar(images_per_epochs)
-        self.params, self.grad_params = self.model.get_parameters()
-        self.best_params = self.params
+        # self.params, self.grad_params = self.model.get_parameters()
+        self.best_params = np.copy(self.params)
         for it in xrange(num_iterations):
 
             loss, _ = self._step()
@@ -573,7 +570,7 @@ class Solver(object):
             epoch_end = (it + 1) % iterations_per_epoch == 0
 
             if epoch_end:
-                print
+                print()
                 self.epoch += 1
 
                 if self.custom_update_ld:
@@ -593,13 +590,11 @@ class Solver(object):
                         print('learning_rate updated: ', next(
                             self.optim_configs.itervalues())['learning_rate'])
                         lr_decay_updated = False
-                    print
+                    print()
                     self._new_training_bar(images_per_epochs)
 
         # At the end of training swap the best params into the model
-        import pdb
-        pdb.set_trace()
-        self.model.params = self.best_params
+        self.params[:] = self.best_params[:]
         if self.multiprocessing:
             try:
                 self.pool.terminate()
