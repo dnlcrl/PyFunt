@@ -10,7 +10,7 @@ Original Source: https://github.com/scipy/scipy/blob/master/setup.py
 '''
 
 if sys.version_info[:2] < (2, 6) or (3, 0) <= sys.version_info[0:2] < (3, 2):
-    raise RuntimeError("Python version 2.6, 2.7 or >= 3.2 required.")
+    raise RuntimeError("Python version 2.6, 2.7 (TODO: >= 3.2) required.")
 
 if sys.version_info[0] < 3:
     import __builtin__ as builtins
@@ -164,12 +164,12 @@ def setup_package():
         name="pyfunt",
         author="Daniele Ettore Ciriello",
         author_email="ciriello.daniele@gmail.com",
-        version="0.1",
+        version="1.0",
         license="MIT",
         url="https://github.com/dnlcrl/PyFunt",
         download_url="https://github.com/dnlcrl/PyFunt",
         description="Pythonic Deep Learning Framework",
-        packages=['pyfunt', 'pyfunt/layers', 'pyfunt/utils'],
+        packages=['pyfunt', 'pyfunt/examples', 'pyfunt/utils', 'pyfunt/examples/residual_networks', ],
         cmdclass=cmdclass,  # {'build_ext': build_ext},
         platforms=["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
         setup_requires=build_requires,
