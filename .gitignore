@@ -1,3 +1,9 @@
+.*
+CIFAR_DATASET_PATH
+.ipynb_checkpoints/
+*.ipynb
+test.py
+
 # Editor temporary/working/backup files #
 #########################################
 .#*
