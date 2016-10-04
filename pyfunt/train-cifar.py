@@ -168,14 +168,14 @@ def custom_update_decay(epoch):
 
 
 def print_infos(solver):
-    print 'Model: \n%s' % solver.model
+    print('Model: \n%s' % solver.model)
 
-    print 'Solver: \n%s' % solver
+    print('Solver: \n%s' % solver)
 
-    print 'Data Augmentation Function: \n'
-    print ''.join(['\t' + i for i in inspect.getsourcelines(data_augm)[0]])
-    print 'Custom Weight Decay Update Rule: \n'
-    print ''.join(['\t' + i for i in inspect.getsourcelines(custom_update_decay)[0]])
+    print('Data Augmentation Function: \n')
+    print(''.join(['\t' + i for i in inspect.getsourcelines(data_augm)[0]]))
+    print('Custom Weight Decay Update Rule: \n')
+    print(''.join(['\t' + i for i in inspect.getsourcelines(custom_update_decay)[0]]))
 
 
 def main():
@@ -227,7 +227,7 @@ def main():
     solver.export_model(exp_path)
     solver.export_histories(exp_path)
 
-    print 'finish'
+    print('finish')
 
 
 if __name__ == '__main__':

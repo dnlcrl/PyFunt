@@ -29,7 +29,7 @@ class Module(object):
         # return self.output
         raise NotImplementedError()
 
-    def forward(self, x=None):
+    def forward(self, x):
         return self.update_output(x)
 
     def backward(self, _input, grad_output, scale=1):

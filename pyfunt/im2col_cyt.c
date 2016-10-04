@@ -20797,10 +20797,10 @@ PyMODINIT_FUNC PyInit_im2col_cyt(void)
   /*--- Function export code ---*/
   /*--- Type init code ---*/
   if (PyType_Ready(&__pyx_type___pyx_array) < 0) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 101; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_type___pyx_array.tp_print = 0;
+  __pyx_type___pyx_array.tp_print(= 0;)
   __pyx_array_type = &__pyx_type___pyx_array;
   if (PyType_Ready(&__pyx_type___pyx_MemviewEnum) < 0) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 271; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_type___pyx_MemviewEnum.tp_print = 0;
+  __pyx_type___pyx_MemviewEnum.tp_print(= 0;)
   __pyx_MemviewEnum_type = &__pyx_type___pyx_MemviewEnum;
   __pyx_vtabptr_memoryview = &__pyx_vtable_memoryview;
   __pyx_vtable_memoryview.get_item_pointer = (char *(*)(struct __pyx_memoryview_obj *, PyObject *))__pyx_memoryview_get_item_pointer;
@@ -20811,7 +20811,7 @@ PyMODINIT_FUNC PyInit_im2col_cyt(void)
   __pyx_vtable_memoryview.convert_item_to_object = (PyObject *(*)(struct __pyx_memoryview_obj *, char *))__pyx_memoryview_convert_item_to_object;
   __pyx_vtable_memoryview.assign_item_from_object = (PyObject *(*)(struct __pyx_memoryview_obj *, char *, PyObject *))__pyx_memoryview_assign_item_from_object;
   if (PyType_Ready(&__pyx_type___pyx_memoryview) < 0) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 304; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_type___pyx_memoryview.tp_print = 0;
+  __pyx_type___pyx_memoryview.tp_print(= 0;)
   if (__Pyx_SetVtable(__pyx_type___pyx_memoryview.tp_dict, __pyx_vtabptr_memoryview) < 0) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 304; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_memoryview_type = &__pyx_type___pyx_memoryview;
   __pyx_vtabptr__memoryviewslice = &__pyx_vtable__memoryviewslice;
@@ -20820,7 +20820,7 @@ PyMODINIT_FUNC PyInit_im2col_cyt(void)
   __pyx_vtable__memoryviewslice.__pyx_base.assign_item_from_object = (PyObject *(*)(struct __pyx_memoryview_obj *, char *, PyObject *))__pyx_memoryviewslice_assign_item_from_object;
   __pyx_type___pyx_memoryviewslice.tp_base = __pyx_memoryview_type;
   if (PyType_Ready(&__pyx_type___pyx_memoryviewslice) < 0) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 923; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_type___pyx_memoryviewslice.tp_print = 0;
+  __pyx_type___pyx_memoryviewslice.tp_print(= 0;)
   if (__Pyx_SetVtable(__pyx_type___pyx_memoryviewslice.tp_dict, __pyx_vtabptr__memoryviewslice) < 0) {__pyx_filename = __pyx_f[2]; __pyx_lineno = 923; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_memoryviewslice_type = &__pyx_type___pyx_memoryviewslice;
   /*--- Type import code ---*/

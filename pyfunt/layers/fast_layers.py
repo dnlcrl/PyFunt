@@ -5,7 +5,7 @@ import numpy as np
 try:
     from im2col_cython import col2im_6d_cython, col2im_cython, im2col_cython
 except ImportError:
-    print 'Installation broken, please reinstall PyFunt'
+    print('Installation broken, please reinstall PyFunt')
 
 
 def conv_forward_im2col(x, w, b, conv_param):

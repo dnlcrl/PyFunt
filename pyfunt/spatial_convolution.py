@@ -6,7 +6,7 @@ import numpy as np
 try:
     from im2col_cyt import col2im_6d_cython
 except ImportError:
-    print 'Installation broken, please reinstall PyFunt'
+    print('Installation broken, please reinstall PyFunt')
 
 
 class SpatialConvolution(Module):

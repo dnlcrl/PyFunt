@@ -3,7 +3,7 @@ import numpy as np
 try:
     from im2col_cyt import im2col_cython, col2im_cython
 except ImportError:
-    print 'Installation broken, please reinstall PyFunt'
+    print('Installation broken, please reinstall PyFunt')
 
 
 class SpatialMaxPooling(Module):
