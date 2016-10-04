@@ -1,6 +1,6 @@
 # PyFunt (/paɪfʊnt/)
 
-A simple Pythonic Deep Learning Framework (WIP and CPU only at the moment) inspired by [Torch](http://torch.ch)'s [Neural Network package](https://github.com/torch/nn)
+Pythonic Deep Learning Framework (WIP and CPU only at the moment) inspired by [Torch](http://torch.ch)'s [Neural Network package](https://github.com/torch/nn)
 
 ## Requirements
 
