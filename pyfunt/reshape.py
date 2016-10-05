@@ -1,5 +1,4 @@
 from module import Module
-import numpy as np
 
 
 class Reshape(Module):

@@ -11,22 +11,10 @@ class Threshold(Module):
         self.inplace = ip
 
     def update_output(self, x):
-        #out = x
-        #indices = np.where(x > self.th)
-        #self.indices = indices
         self.output = np.maximum(self.th, x)
         return self.output
 
-    def update_grad_input(self, x, grad_output, scale=1):
-        #self.validate_parameters()
-        # indices = self.indices
-        # if self.inplace:
-        #     grad_output[indices] = 0.
-        #     return grad_output
-        # dx = grad_output
-        # dx[indices] = 0.
-        # self.grad_input = dx
-        # return self.grad_input
+    def update_grad_input(self, x, grad_output):
         dx = np.array(grad_output, copy=True)
         dx[x <= 0] = 0
         self.grad_input = dx
