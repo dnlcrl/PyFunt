@@ -19,7 +19,6 @@ class Dropout(Module):
         self.output = x.copy()
         if self.p > 0:
             if self.train or self.stochastic_inference:
-                self.noise = np.zeros_like(x)
                 self.noise = np.random.binomial(1, p=1-self.p, size=x.shape)  # bernoulli
                 if self.v2:
                     self.noise /= 1-self.p

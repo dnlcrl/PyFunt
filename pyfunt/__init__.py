@@ -15,6 +15,7 @@ from parallel import Parallel
 from relu import ReLU
 from reshape import Reshape
 from sequential import Sequential
+from soft_max import SoftMax
 from solver import Solver
 from spatial_average_pooling import SpatialAveragePooling
 from spatial_batch_normalitazion import SpatialBatchNormalization
