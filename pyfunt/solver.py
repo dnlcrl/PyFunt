@@ -3,7 +3,6 @@ import numpy as np
 from datetime import datetime
 import optim
 import os
-from sklearn.externals import joblib
 import multiprocessing as mp
 import signal
 from copy_reg import pickle
@@ -313,8 +312,12 @@ class Solver(object):
         try:
             num = max([int(f.split('_')[1]) for f in checkpoints])
             name = 'check_' + str(num)
-            cp = joblib.load(
-                os.path.join(self.path_checkpoints, name, name + '.pkl'))
+            try:
+                cp = np.load(
+                    os.path.join(self.path_checkpoints, name, name + '.pkl'))
+            except:
+                print 'sorry, I haven\'t fixed this line, but it should be easy to fix, if you want you can try now and make a pull request'
+                import pdb; pdb.set_trace()
             # Set up some variables for book-keeping
 
             self.epoch = cp['epoch']
@@ -345,8 +348,12 @@ class Solver(object):
         directory = os.path.join(self.path_checkpoints, name)
         if not os.path.exists(directory):
             os.makedirs(directory)
-        joblib.dump(checkpoints, os.path.join(
-            directory, name + '.pkl'))
+        try:
+            np.save(checkpoints, os.path.join(
+                directory, name + '.pkl'))
+        except:
+            print 'sorry, I haven\'t fixed this line, but it should be easy to fix, if you want you can try now and make a pull request'
+            import pdb; pdb.set_trace()
 
     def export_model(self, path):
         if not os.path.exists(path):
