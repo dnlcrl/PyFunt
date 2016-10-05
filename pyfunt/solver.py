@@ -10,8 +10,9 @@ from types import MethodType
 import sys
 from tqdm import tqdm
 
-
+# TODO: REMOVE THIS
 import pdb
+
 
 def rel_error(x, y):
     """ returns relative error """
@@ -82,12 +83,13 @@ def init_worker():
     '''
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
+
 def loss_helper(args):
     model, criterion, x, y = args
     preds = model.forward(x)
     loss = criterion.forward(preds, y)
     dout = criterion.backward(preds, y)
-    din = model.backward(x, dout)
+    _ = model.backward(x, dout)
     _, grads = model.get_parameters()
     return loss, grads
 
@@ -316,8 +318,8 @@ class Solver(object):
                 cp = np.load(
                     os.path.join(self.path_checkpoints, name, name + '.pkl'))
             except:
-                print 'sorry, I haven\'t fixed this line, but it should be easy to fix, if you want you can try now and make a pull request'
-                import pdb; pdb.set_trace()
+                print('sorry, I haven\'t fixed this line, but it should be easy to fix, if you want you can try now and make a pull request')
+                pdb.set_trace()
             # Set up some variables for book-keeping
 
             self.epoch = cp['epoch']
@@ -352,8 +354,8 @@ class Solver(object):
             np.save(checkpoints, os.path.join(
                 directory, name + '.pkl'))
         except:
-            print 'sorry, I haven\'t fixed this line, but it should be easy to fix, if you want you can try now and make a pull request'
-            import pdb; pdb.set_trace()
+            print('sorry, I haven\'t fixed this line, but it should be easy to fix, if you want you can try now and make a pull request')
+            pdb.set_trace()
 
     def export_model(self, path):
         if not os.path.exists(path):
