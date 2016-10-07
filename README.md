@@ -24,18 +24,10 @@ Check the [examples folder](https://github.com/dnlcrl/PyFunt/tree/master/pyfunt/
 
 Parametric models can be built easily thanks to the module structure:
 
-	from pyfunt.spatial_convolution import SpatialConvolution
-	from pyfunt.spatial_batch_normalitazion import SpatialBatchNormalization
-	from pyfunt.spatial_average_pooling import SpatialAveragePooling
-	from pyfunt.sequential import Sequential
-	from pyfunt.relu import ReLU
-	from pyfunt.linear import Linear
-	from pyfunt.reshape import Reshape
-	from pyfunt.log_soft_max import LogSoftMax
-	from pyfunt.padding import Padding
-	from pyfunt.identity import Identity
-	from pyfunt.concat_table import ConcatTable
-	from pyfunt.c_add_table import CAddTable
+	from pyfunt import (SpatialConvolution, SpatialBatchNormalization,
+                    SpatialAveragePooling, Sequential, ReLU, Linear,
+                    Reshape, LogSoftMax, Padding, Identity, ConcatTable,
+                    CAddTable)
 
 	def residual_layer(n_channels, n_out_channels=None, stride=None):
 	    n_out_channels = n_out_channels or n_channels
