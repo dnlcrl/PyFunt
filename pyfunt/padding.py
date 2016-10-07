@@ -18,7 +18,7 @@ class Padding(Module):
             if axis in self.dim:
                 pads += [(self.pad, self.pad)]
             else:
-                pads += [(0,0)]
+                pads += [(0, 0)]
         pads = tuple(pads)
         self.output = np.pad(x, pads, mode='constant')
         return self.output
