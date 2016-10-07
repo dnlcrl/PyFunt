@@ -20,6 +20,8 @@ from solver import Solver
 from spatial_average_pooling import SpatialAveragePooling
 from spatial_batch_normalitazion import SpatialBatchNormalization
 from spatial_convolution import SpatialConvolution
+from spatial_replication_padding import SpatialReplicationPadding
+from spatial_reflection_padding import SpatialReflectionPadding
 from spatial_max_pooling import SpatialMaxPooling
 from threshold import Threshold
 from view import View
