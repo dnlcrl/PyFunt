@@ -1,7 +1,6 @@
 import torchfile
 import pyfunt
 import pdb
-import numpy as np
 
 please_contribute = 'If you want you can fix it and make a pull request ;)'
 
@@ -80,7 +79,7 @@ def load_t7model(path):
                 else:
                     try:
                         module = Module()
-                    except Exception as e:
+                    except:
                         print('parser for %s not found' % class_name)
                         print('%s cannot be initialized with no args' % class_name)
                         print(please_contribute)
@@ -96,8 +95,7 @@ def load_t7model(path):
             print(please_contribute)
             pdb.set_trace()
             raise NotImplementedError
-    import pdb; pdb.set_trace()
-    return module
+    return model
 
 
 def is_container(tm):

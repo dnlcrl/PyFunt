@@ -126,7 +126,6 @@ class Module(object):
 #    return self:type('torch.CudaTensor',...)
 # end
 
-    @abc.abstractmethod
     def reset(self):
         raise NotImplementedError()
 
