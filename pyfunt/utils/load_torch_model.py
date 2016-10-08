@@ -163,13 +163,3 @@ def load_t7checkpoint(path, models_keys=['model']):
     for model in models_keys:
         cp[model] = load_t7model(obj=cp[model])
     return cp
-
-
-if __name__ == '__main__':
-    # TODO remove path :P
-
-    #d = load_t7model('/Users/mbp/Desktop/fast-neural-style-pyfunt/models/vgg16.t7')
-    d = load_t7checkpoint(
-        '/Users/mbp/Desktop/fast-neural-style-pyfunt/models/instance_norm/candy.t7')
-    import pdb
-    pdb.set_trace()
