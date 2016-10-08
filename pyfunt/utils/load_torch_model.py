@@ -81,7 +81,7 @@ def load_t7model(path=None, obj=None, model=None, custom_layers=None):
             raise Exception('model is a torchobj but not a container')
         model = Module()
         add_inout(model, tmodule)
-        model = load_t7model(obj=tmodule, model=model, custom_layers=None)
+        model = load_t7model(obj=tmodule, model=model, custom_layers=custom_layers)
     else:
         for i, tmodule in enumerate(o.modules):
             if type(tmodule) is torchfile.TorchObject:
@@ -105,7 +105,7 @@ def load_t7model(path=None, obj=None, model=None, custom_layers=None):
                 #         model = load_t7model(obj=tmodule, model=model)
                 # else:
                 if is_container(Module):
-                    model = load_t7model(obj=tmodule, model=model, custom_layers=None)
+                    model = load_t7model(obj=tmodule, model=model, custom_layers=custom_layers)
                 else:
                     if class_name in load_parser_init:
                         args = load_parser_init[class_name](tmodule_o)
