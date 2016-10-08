@@ -29,17 +29,23 @@ def spatial_average_pooling_init(m):
     return m['kW'], m['kH'], m['dW'], m['dH'], m['padW'], m['padH']
 
 
+def spatial_padding_init(m):
+    return m['pad_l'], m['pad_r'], m['pad_t'], m['pad_b']
+
+
 def view_init(m):
     return (m['size'],)
 
 
-parser_init = {
+load_parser_init = {
     'SpatialConvolution': conv_init,
     'Dropout': dropout_init,
     'Linear': linear_init,
     'ReLU': relu_init,
     'SpatialMaxPooling': spatial_max_pooling_init,
     'SpatialAvergaePooling': spatial_average_pooling_init,
+    'SpatialReflectionPadding': spatial_padding_init,
+    'SpatialReplicationPadding': spatial_padding_init,
     'View': view_init
 }
 
@@ -48,12 +54,12 @@ def dropout_vals(module, tmodule):
     add_value(module, tmodule, 'noise')
 
 
-parser_vals = {
+load_parser_vals = {
     'Droput': dropout_vals
 }
 
 
-def load_t7model(path=None, obj=None, model=None):
+def load_t7model(path=None, obj=None, model=None, custom_layers=None):
     if not (path is None or obj is None):
         raise Exception('you must pass a path or a TorchObject')
     if path:
@@ -72,45 +78,52 @@ def load_t7model(path=None, obj=None, model=None):
 
         Module = getattr(pyfunt, class_name)
         if not is_container(Module):
-            raise('model is a torchobj but not a container')
+            raise Exception('model is a torchobj but not a container')
         model = Module()
         add_inout(model, tmodule)
         model = load_t7model(obj=tmodule, model=model)
-
     else:
         for i, tmodule in enumerate(o.modules):
             if type(tmodule) is torchfile.TorchObject:
                 class_name = tmodule._typename.split('.')[-1]
-                tmodule = tmodule._obj
+                tmodule_o = tmodule._obj
 
-                if not hasattr(pyfunt, class_name):
+                if hasattr(pyfunt, class_name):
+                    Module = getattr(pyfunt, class_name)
+                elif custom_layers and hasattr(custom_layers, class_name):
+                    Module = getattr(custom_layers, class_name)
+                else:
                     print('class %s not found' % class_name)
                     print(please_contribute)
                     raise NotImplementedError
 
-                Module = getattr(pyfunt, class_name)
                 if i == 0 and model is None:
                     if not is_container(Module):
                         model = pyfunt.Sequential()
-                    else:
-                        model = Module()
+                #     else:
+                #         model = Module()
+                #         model = load_t7model(obj=tmodule, model=model)
+                # else:
+                if is_container(Module):
+                    model = load_t7model(obj=tmodule, model=model)
                 else:
-                    if class_name in parser_init:
-                        args = parser_init[class_name](tmodule)
+                    if class_name in load_parser_init:
+                        args = load_parser_init[class_name](tmodule_o)
                         module = Module(*args)
                     else:
                         try:
                             module = Module()
                         except:
                             print('parser for %s not found' % class_name)
-                            print('%s cannot be initialized with no args' % class_name)
+                            print('%s cannot be initialized with no args' %
+                                  class_name)
                             print(please_contribute)
                             raise NotImplementedError
 
-                    add_inout(module, tmodule)
-                    add_w(module, tmodule)
-                    if class_name in parser_vals:
-                        parser_vals[class_name](module, tmodule)
+                    add_inout(module, tmodule_o)
+                    add_w(module, tmodule_o)
+                    if class_name in load_parser_vals:
+                        load_parser_vals[class_name](module, tmodule_o)
                     model.add(module)
             else:
                 print('oops!')
@@ -121,7 +134,7 @@ def load_t7model(path=None, obj=None, model=None):
 
 
 def is_container(tm):
-    return tm.__bases__ == pyfunt.Container
+    return pyfunt.container.Container in tm.__bases__
 
 
 def add_value(module, tmodule, pname, tpname=None):
@@ -152,8 +165,11 @@ def load_t7checkpoint(path, models_keys=['model']):
     return cp
 
 
-
 if __name__ == '__main__':
     # TODO remove path :P
-    d = load_t7checkpoint('/Users/mbp/Desktop/fast-neural-style-pyfunt/models/instance_norm/candy.t7')
-    import pdb; pdb.set_trace()
+
+    #d = load_t7model('/Users/mbp/Desktop/fast-neural-style-pyfunt/models/vgg16.t7')
+    d = load_t7checkpoint(
+        '/Users/mbp/Desktop/fast-neural-style-pyfunt/models/instance_norm/candy.t7')
+    import pdb
+    pdb.set_trace()
