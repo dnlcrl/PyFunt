@@ -161,5 +161,5 @@ def load_t7checkpoint(path, models_keys=['model'], custom_layers=None):
     # the model to load in pyfunt
     cp = torchfile.load(path)
     for model in models_keys:
-        cp[model] = load_t7model(obj=cp[model])
+        cp[model] = load_t7model(obj=cp[model], custom_layers=custom_layers)
     return cp
