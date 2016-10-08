@@ -17,6 +17,10 @@ def linear_init(m):
     return m['weight'].shape[1], m['weight'].shape[0], len(m['bias']) != 0
 
 
+def mul_constant_init(m):
+    return (m['constantScalar'],)
+
+
 def relu_init(m):
     return (m['inplace'],)
 
@@ -27,6 +31,10 @@ def spatial_max_pooling_init(m):
 
 def spatial_average_pooling_init(m):
     return m['kW'], m['kH'], m['dW'], m['dH'], m['padW'], m['padH']
+
+
+def spatial_full_convolution_init(m):
+    return m['nInputPlane'], m['nOutputPlane'], m['kW'], m['kH'], m['dW'], m['dH'], m['padW'], m['padH'], m['adjW'], m['adjH']
 
 
 def spatial_padding_init(m):
@@ -41,9 +49,11 @@ load_parser_init = {
     'SpatialConvolution': conv_init,
     'Dropout': dropout_init,
     'Linear': linear_init,
+    'MulConstant': mul_constant_init,
     'ReLU': relu_init,
     'SpatialMaxPooling': spatial_max_pooling_init,
     'SpatialAvergaePooling': spatial_average_pooling_init,
+    'SpatialFullConvolution': spatial_full_convolution_init,
     'SpatialReflectionPadding': spatial_padding_init,
     'SpatialReplicationPadding': spatial_padding_init,
     'View': view_init
