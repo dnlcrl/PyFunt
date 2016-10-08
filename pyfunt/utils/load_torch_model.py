@@ -156,7 +156,7 @@ def add_w(module, tmodule):
     add_value(module, tmodule, 'grad_bias', 'gradBias')
 
 
-def load_t7checkpoint(path, models_keys=['model']):
+def load_t7checkpoint(path, models_keys=['model'], custom_layers=None):
     # model_keys iterable that contains for example the word 'model'
     # the model to load in pyfunt
     cp = torchfile.load(path)
