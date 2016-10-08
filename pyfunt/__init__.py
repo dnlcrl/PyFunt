@@ -10,6 +10,7 @@ from identity import Identity
 from linear import Linear
 from log_soft_max import LogSoftMax
 from module import Module
+from mul_constant import MulConstant
 from padding import Padding
 from parallel import Parallel
 from relu import ReLU
@@ -20,9 +21,12 @@ from solver import Solver
 from spatial_average_pooling import SpatialAveragePooling
 from spatial_batch_normalitazion import SpatialBatchNormalization
 from spatial_convolution import SpatialConvolution
+from spatial_full_convolution import SpatialFullConvolution
 from spatial_replication_padding import SpatialReplicationPadding
 from spatial_reflection_padding import SpatialReflectionPadding
 from spatial_max_pooling import SpatialMaxPooling
+from spatial_up_sampling_nearest import SpatialUpSamplingNearest
+from tanh import Tanh
 from threshold import Threshold
 from view import View
 
