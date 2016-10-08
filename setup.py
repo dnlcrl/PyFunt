@@ -164,7 +164,7 @@ def setup_package():
         name="pyfunt",
         author="Daniele Ettore Ciriello",
         author_email="ciriello.daniele@gmail.com",
-        version="1.0.5",
+        version="1.0.9",
         license="MIT",
         url="https://github.com/dnlcrl/PyFunt",
         download_url="https://github.com/dnlcrl/PyFunt",

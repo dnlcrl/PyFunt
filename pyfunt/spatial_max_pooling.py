@@ -23,15 +23,19 @@ class SpatialMaxPooling(Module):
         self.divide = True
 
     def ceil(self):
+        # TODO:
         self.ceil_mode = True
 
     def floor(self):
+        # TODO:
         self.ceil_mode = False
 
     def set_count_include_pad(self):
+        # TODO:
         self.count_include_pad = True
 
     def set_count_exclude_pad(self):
+        # TODO:
         self.count_include_pad = False
 
     def update_output(self, x):
