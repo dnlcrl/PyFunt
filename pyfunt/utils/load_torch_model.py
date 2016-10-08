@@ -53,48 +53,70 @@ parser_vals = {
 }
 
 
-def load_t7model(path):
-    # o = torchfile.load('/Users/mbp/Downloads/Chrome/vgg16.t7')
-    o = torchfile.load(path)
-    # for node in o.forwardnodes: print(repr(node.data.module))
+def load_t7model(path=None, obj=None, model=None):
+    if not (path is None or obj is None):
+        raise Exception('you must pass a path or a TorchObject')
+    if path:
+        o = torchfile.load(path)
+    else:
+        o = obj
 
-    for i, tmodule in enumerate(o.modules):
-        if type(tmodule) is torchfile.TorchObject:
-            class_name = tmodule._typename.split('.')[-1]
-            tmodule = tmodule._obj
-            if not hasattr(pyfunt, class_name):
-                print('class %s not found' % class_name)
-                print(please_contribute)
-                raise NotImplementedError
-            Module = getattr(pyfunt, class_name)
-            if i == 0:
-                if not is_container(Module):
-                    model = pyfunt.Sequential()
-                else:
-                    model = Module()
-            else:
-                if class_name in parser_init:
-                    args = parser_init[class_name](tmodule)
-                    module = Module(*args)
-                else:
-                    try:
-                        module = Module()
-                    except:
-                        print('parser for %s not found' % class_name)
-                        print('%s cannot be initialized with no args' % class_name)
-                        print(please_contribute)
-                        raise NotImplementedError
+    if type(o) is torchfile.TorchObject:
+        class_name = o._typename.split('.')[-1]
+        tmodule = o._obj
 
-                add_inout(module, tmodule)
-                add_w(module, tmodule)
-                if class_name in parser_vals:
-                    parser_vals[class_name](module, tmodule)
-                model.add(module)
-        else:
-            print('oops!')
+        if not hasattr(pyfunt, class_name):
+            print('class %s not found' % class_name)
             print(please_contribute)
-            pdb.set_trace()
             raise NotImplementedError
+
+        Module = getattr(pyfunt, class_name)
+        if not is_container(Module):
+            raise('model is a torchobj but not a container')
+        model = Module()
+        add_inout(model, tmodule)
+        model = load_t7model(obj=tmodule, model=model)
+
+    else:
+        for i, tmodule in enumerate(o.modules):
+            if type(tmodule) is torchfile.TorchObject:
+                class_name = tmodule._typename.split('.')[-1]
+                tmodule = tmodule._obj
+
+                if not hasattr(pyfunt, class_name):
+                    print('class %s not found' % class_name)
+                    print(please_contribute)
+                    raise NotImplementedError
+
+                Module = getattr(pyfunt, class_name)
+                if i == 0 and model is None:
+                    if not is_container(Module):
+                        model = pyfunt.Sequential()
+                    else:
+                        model = Module()
+                else:
+                    if class_name in parser_init:
+                        args = parser_init[class_name](tmodule)
+                        module = Module(*args)
+                    else:
+                        try:
+                            module = Module()
+                        except:
+                            print('parser for %s not found' % class_name)
+                            print('%s cannot be initialized with no args' % class_name)
+                            print(please_contribute)
+                            raise NotImplementedError
+
+                    add_inout(module, tmodule)
+                    add_w(module, tmodule)
+                    if class_name in parser_vals:
+                        parser_vals[class_name](module, tmodule)
+                    model.add(module)
+            else:
+                print('oops!')
+                print(please_contribute)
+                pdb.set_trace()
+                raise NotImplementedError
     return model
 
 
@@ -121,5 +143,17 @@ def add_w(module, tmodule):
     add_value(module, tmodule, 'grad_bias', 'gradBias')
 
 
+def load_t7checkpoint(path, models_keys=['model']):
+    # model_keys iterable that contains for example the word 'model'
+    # the model to load in pyfunt
+    cp = torchfile.load(path)
+    for model in models_keys:
+        cp[model] = load_t7model(obj=cp[model])
+    return cp
+
+
+
 if __name__ == '__main__':
-    load_t7model('/Users/mbp/Downloads/Chrome/vgg16.t7')
+    # TODO remove path :P
+    d = load_t7checkpoint('/Users/mbp/Desktop/fast-neural-style-pyfunt/models/instance_norm/candy.t7')
+    import pdb; pdb.set_trace()
