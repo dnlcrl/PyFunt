@@ -4,7 +4,7 @@
 from module import Module
 import numpy as np
 try:
-    from im2col_cyt import col2im_6d_cython
+    from im2col_cyt import col2im_cython
 except ImportError:
     print('Installation broken, please reinstall PyFunt')
 
@@ -116,8 +116,9 @@ class SpatialConvolution(Module):
         self.grad_weight[:] = dout_reshaped.dot(x_cols.T).reshape(w.shape)[:]
 
         dx_cols = w.reshape(F, -1).T.dot(dout_reshaped)
-        dx_cols.shape = (C, HH, WW, N, out_h, out_w)
-        dx = col2im_6d_cython(dx_cols, N, C, H, W, HH, WW, pad, stride)
+        #dx_cols.shape = (C, HH, WW, N, out_h, out_w)
+        # dx = col2im_6d_cython(dx_cols, N, C, H, W, HH, WW, pad, stride)
+        dx = col2im_cython(dx_cols, N, C, H, W, HH, WW, pad, stride)
         self.grad_input = dx
         return dx
 

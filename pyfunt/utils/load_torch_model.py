@@ -1,6 +1,7 @@
 import torchfile
 import pyfunt
 import pdb
+import re
 
 please_contribute = 'If you want you can fix it and make a pull request ;)'
 
@@ -12,6 +13,8 @@ Once you wrote the function, add the reation in the load_parser_init dict.
 The same mechanism goes for the layer values using load_parser_vals dictt
 (gard input, output, weight, bias already get added).
 '''
+
+
 def conv_init(m):
     return m['nInputPlane'], m['nOutputPlane'], m['kW'], m['kH'], m['dW'], m['dH'], m['padW'], m['padH']
 
@@ -52,7 +55,6 @@ def view_init(m):
     return (m['size'],)
 
 
-
 load_parser_init = {
     'Dropout': dropout_init,
     'Linear': linear_init,
@@ -68,12 +70,28 @@ load_parser_init = {
 }
 
 
+# def add_possible_values(module, tmodule):
+#     print(len(dir(tmodule)))
+#     for k in dir(tmodule):
+#         if any(x.isupper() for x in k):
+#             ourk = re.sub('([A-Z]+)', r'_\1', k).lower()
+#             add_value(module, tmodule, ourk, k)
+#         else:
+#             add_value(module, tmodule, k)
+
+
 def dropout_vals(module, tmodule):
     add_value(module, tmodule, 'noise')
 
 
+def spatial_batch_normalization_vals(module, tmodule):
+    add_value(module, tmodule, 'running_mean')
+    add_value(module, tmodule, 'running_var')
+
+
 load_parser_vals = {
-    'Droput': dropout_vals
+    'Droput': dropout_vals,
+    'SpatialBatchNormalization': spatial_batch_normalization_vals
 }
 
 
@@ -128,7 +146,8 @@ def load_t7model(path=None, obj=None, model=None, custom_layers=None):
                 #         model = load_t7model(obj=tmodule, model=model)
                 # else:
                 if is_container(Module):
-                    model.add(load_t7model(obj=tmodule, model=model, custom_layers=custom_layers))
+                    model.add(
+                        load_t7model(obj=tmodule, model=model, custom_layers=custom_layers))
                 else:
                     if class_name in load_parser_init:
                         args = load_parser_init[class_name](tmodule_o)
@@ -143,16 +162,12 @@ def load_t7model(path=None, obj=None, model=None, custom_layers=None):
                             print(please_contribute)
                             raise NotImplementedError
 
+                    #add_possible_values(module, tmodule)
                     add_inout(module, tmodule_o)
                     add_w(module, tmodule_o)
                     if class_name in load_parser_vals:
                         load_parser_vals[class_name](module, tmodule_o)
-                    # import pdb; pdb.set_trace()
-                    print(class_name)
-                    try:
-                        print(tmodule['weight'].shape)
-                    except:
-                        pass
+
                     model.add(module)
             else:
                 print('oops!')
