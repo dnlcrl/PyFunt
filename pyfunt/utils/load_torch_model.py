@@ -5,6 +5,13 @@ import pdb
 please_contribute = 'If you want you can fix it and make a pull request ;)'
 
 
+'''
+<Layer>_init (module) takes a dict for the torch layer and returns a tuple
+containing the values for the pyfunt layer initialization funciton.
+Once you wrote the function, add the reation in the load_parser_init dict.
+The same mechanism goes for the layer values using load_parser_vals dictt
+(gard input, output, weight, bias already get added).
+'''
 def conv_init(m):
     return m['nInputPlane'], m['nOutputPlane'], m['kW'], m['kH'], m['dW'], m['dH'], m['padW'], m['padH']
 
@@ -18,7 +25,7 @@ def linear_init(m):
 
 
 def mul_constant_init(m):
-    return (m['constantScalar'],)
+    return (m['constant_scalar'],)
 
 
 def relu_init(m):
@@ -45,12 +52,13 @@ def view_init(m):
     return (m['size'],)
 
 
+
 load_parser_init = {
-    'SpatialConvolution': conv_init,
     'Dropout': dropout_init,
     'Linear': linear_init,
     'MulConstant': mul_constant_init,
     'ReLU': relu_init,
+    'SpatialConvolution': conv_init,
     'SpatialMaxPooling': spatial_max_pooling_init,
     'SpatialAvergaePooling': spatial_average_pooling_init,
     'SpatialFullConvolution': spatial_full_convolution_init,
@@ -77,6 +85,7 @@ def load_t7model(path=None, obj=None, model=None, custom_layers=None):
     else:
         o = obj
 
+    # import pdb; pdb.set_trace()
     if type(o) is torchfile.TorchObject:
         class_name = o._typename.split('.')[-1]
         tmodule = o._obj
@@ -91,8 +100,12 @@ def load_t7model(path=None, obj=None, model=None, custom_layers=None):
             raise Exception('model is a torchobj but not a container')
         model = Module()
         add_inout(model, tmodule)
-        model = load_t7model(obj=tmodule, model=model, custom_layers=custom_layers)
+
+        m = load_t7model(obj=tmodule, model=model, custom_layers=custom_layers)
+        if not model:
+            model = m
     else:
+
         for i, tmodule in enumerate(o.modules):
             if type(tmodule) is torchfile.TorchObject:
                 class_name = tmodule._typename.split('.')[-1]
@@ -115,7 +128,7 @@ def load_t7model(path=None, obj=None, model=None, custom_layers=None):
                 #         model = load_t7model(obj=tmodule, model=model)
                 # else:
                 if is_container(Module):
-                    model = load_t7model(obj=tmodule, model=model, custom_layers=custom_layers)
+                    model.add(load_t7model(obj=tmodule, model=model, custom_layers=custom_layers))
                 else:
                     if class_name in load_parser_init:
                         args = load_parser_init[class_name](tmodule_o)
@@ -134,6 +147,12 @@ def load_t7model(path=None, obj=None, model=None, custom_layers=None):
                     add_w(module, tmodule_o)
                     if class_name in load_parser_vals:
                         load_parser_vals[class_name](module, tmodule_o)
+                    # import pdb; pdb.set_trace()
+                    print(class_name)
+                    try:
+                        print(tmodule['weight'].shape)
+                    except:
+                        pass
                     model.add(module)
             else:
                 print('oops!')

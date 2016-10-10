@@ -38,7 +38,7 @@ class BatchNormalization(Module):
     def check_input_dim(self, x):
         i_dim = len(x.shape)
         if i_dim != self.n_dim or (i_dim != self.n_dim - 1 and self.train is not False):
-            raise('TODO ERROR :(')
+            raise Exception('TODO ERROR :(')
         # feast_dim = (i_dim == self.n_dim -1) and 1 or 2
         #      local featDim = (iDim == self.nDim - 1) and 1 or 2
         # assert(input:size(featDim) == self.running_mean:nElement(), string.format(

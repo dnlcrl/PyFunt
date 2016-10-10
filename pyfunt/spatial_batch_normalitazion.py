@@ -7,8 +7,8 @@ from batch_normalization import BatchNormalization
 class SpatialBatchNormalization(BatchNormalization):
     n_dim = 4
 
-    def __init__(self, args):
-        super(SpatialBatchNormalization, self).__init__(args)
+    def __init__(self, *args):
+        super(SpatialBatchNormalization, self).__init__(*args)
 
     def update_output(self, x):
         N, C, H, W = x.shape

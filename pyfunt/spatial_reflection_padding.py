@@ -12,35 +12,35 @@ class SpatialReflectionPadding(Module):
         self.pad_b = pad_b or self.pad_l
 
     def update_output(self, x):
-        if x.dims == 3:
+        if x.ndim == 3:
             self.output = np.pad(
                 x, ((0, 0), (self.pad_t, self.pad_b), (self.pad_l, self.pad_r)), 'reflect')
-        elif x.dims == 4:
+        elif x.ndim == 4:
             self.output = np.pad(
                 x, ((0, 0), (0, 0), (self.pad_t, self.pad_b), (self.pad_l, self.pad_r)), 'reflect')
 
         else:
-            raise('input must be 3 or 4-dimensional')
+            raise Exception('input must be 3 or 4-dimensional')
         return self.output
 
     def update_grad_input(self, x, grad_output):
-        if x.dims == grad_output.dims == 3:
+        if x.ndim == grad_output.ndim == 3:
             if not (x.shape[0] == grad_output.shape[0] and
                     x.shape[1] + self.pad_t + self.pad_b == grad_output.shape[1] and
                     x.shape[2] + self.pad_l + self.pad_r == grad_output.shape[2]):
-                raise('input and gradOutput must be compatible in size')
+                raise Exception('input and gradOutput must be compatible in size')
             self.grad_input = grad_output[:, self.pad_t:self.pad_b, self.pad_l:self.pad_r]
-        elif x.dims == grad_output.dims == 4:
+        elif x.ndim == grad_output.ndim == 4:
             if not (x.shape[0] == grad_output.shape[0] and
                     x.shape[1] == grad_output.shape[1] and
                     x.shape[2] + self.pad_t + self.pad_b == grad_output.shape[2] and
                     x.shape[3] + self.pad_l + self.pad_r == grad_output.shape[3]):
-                raise('input and gradOutput must be compatible in size')
+                raise Exception('input and gradOutput must be compatible in size')
             self.grad_input = grad_output[:, :, self.pad_t:self.pad_b, self.pad_l:self.pad_r]
         else:
-            raise(
+            raise Exception(
                 'input and gradOutput must be 3 or 4-dimensional and have equal number of dimensions')
         return self.grad_input
 
     def __str__(self):
-        return type(self) + '(l=%d, r=%d, t=%d, b=%d)' % (self.pad_l, self.pad_r, self.pad_t, self.pad_b)
+        return str(type(self)) + '(l=%d, r=%d, t=%d, b=%d)' % (self.pad_l, self.pad_r, self.pad_t, self.pad_b)

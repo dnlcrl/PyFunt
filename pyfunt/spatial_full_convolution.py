@@ -30,7 +30,7 @@ class SpatialFullConvolution(Module):
         self.adjH = adjH
 
         if self.adjW > self.dW - 1 or self.adjH > self.dH - 1:
-            raise(
+            raise Exception(
                 'adjW and adjH must be smaller than self.dW - 1 and self.dH - 1 respectively')
 
         self.weight = np.ndarray((n_input_plane, n_output_plane, kH, kW))
@@ -46,9 +46,7 @@ class SpatialFullConvolution(Module):
 
     def reset(self, stdv=None):
         if not stdv:
-            stdv = stdv * np.sqrt(self.kW*self.kH*self.n_input_plane)
-        else:
-            stdv = stdv * np.sqrt(3)
+            stdv = 1/np.sqrt(self.kW*self.kH*self.n_input_plane)
         self.weight = np.random.normal(
             0, stdv, (self.n_output_plane, self.n_input_plane, self.kH, self.kW))
         self.bias = np.zeros(self.n_output_plane)
@@ -63,45 +61,67 @@ class SpatialFullConvolution(Module):
         return (target_size + 2 * pad - ker) % stride
 
     def update_output(self, x):
-        w, b = self.weight, self.bias
-        # input = make_contigous (input)N, C, H, W = x.shape
-        self.x_shape = N, C, H, W = x.shape
-        outW = (W - 1) * self.dW - 2*self.padW + self.kW + self.adjW
-
-        F, _, HH, WW = w.shape
-        stride, pad = self.dW, self.padW
-
-        p = pad
-        x = np.pad(
-            x, ((0, 0), (0, 0), (p, p), (p, p)), mode='constant')
-
-        self.tiles_w = (W + 2 * pad - WW) % stride
-        self.tiles_h = (H + 2 * pad - HH) % stride
-
+        # x->x, gradout ->x, gradinput->output
+        # x_shape-> outputshape
         w = self.weight
+        F, FF, HH, WW = w.shape
 
         stride, pad = self.dW, self.padW
-
-        N, C, H, W = self.x_shape
-        F, _, HH, WW = w.shape
-        _, _, out_h, out_w = x.shape
+        N, in_C, inW, inH = x.shape
+        C = self.n_output_plane
+        W = (inW - 1) * self.dW - 2*self.padW + WW  # x_shape
+        H = (inH - 1) * self.dH - 2*self.padH + HH  # x_shape
+        _, _, in_h, in_w = x.shape
 
         x_reshaped = x.transpose(1, 0, 2, 3).reshape(F, -1)
 
-        out_cols = w.reshape(F, -1).dot(x_reshaped) + b.reshape(-1, 1)
-        out_cols.shape = (C, HH, WW, N, out_h, out_w)
-        self.output = col2im_6d_cython(
-            out_cols, N, C, H, W, HH, WW, pad, stride)
+        out_cols = w.reshape(F, -1).T.dot(x_reshaped)
+        out_cols.shape = (C, HH, WW, N, in_h, in_w)
+        self.output = col2im_6d_cython(out_cols, N, C, H, W, HH, WW, pad, stride)
+        self.output += self.bias.reshape(1, -1, 1, 1)
         if self.adjW:
             self.output = np.pad(
-                self.output, ((0, 0), (0, 0), (0, self.adjW), (0, 0)))
+                self.output, ((0, 0), (0, 0), (0, self.adjW), (0, 0)), mode='constant')
         if self.adjH:
             self.output = np.pad(
-                self.output, ((0, 0), (0, 0), (0, 0), (0, self.adjH)))
-        assert(outW == self.output.shape[2])
+                self.output, ((0, 0), (0, 0), (0, 0), (0, self.adjH)), mode='constant')
+        import pdb; pdb.set_trace()
         return self.output
+        # w, b = self.weight, self.bias
+        # # input = make_contigous (input)N, C, H, W = x.shape
+        # N, C, H, W = x.shape
+        # outW = (W - 1) * self.dW - 2*self.padW + self.kW + self.adjW
+
+        # F, FF, HH, WW = w.shape
+        # stride, pad = self.dW, self.padW
+
+        # p = pad
+        # x = np.pad(
+        #     x, ((0, 0), (0, 0), (p, p), (p, p)), mode='constant')
+
+        # self.tiles_w = (W + 2 * pad - WW) % stride
+        # self.tiles_h = (H + 2 * pad - HH) % stride
+
+        # stride, pad = self.dW, self.padW
+
+        # out_w  = (W - 1) * self.dW - 2*self.padW + WW;
+        # out_h = (H - 1) * self.dH - 2*self.padH + HH;
+        # _, _, out_h, out_w = x.shape
+        # import pdb; pdb.set_trace()
+        # x_reshaped = x.transpose(1, 0, 2, 3).reshape(F, -1)
+        # out_cols = w.reshape(F, -1).T.dot(x_reshaped)# + b.reshape(-1, 1)
+        # out_cols.shape = (self.n_output_plane, -1)
+        # b_reshaped = b.reshape(self.n_output_plane, -1)
+        # out_cols += b_reshaped
+        # out_cols.shape = (self.n_output_plane, HH, WW, N, out_h, out_w)
+        # #out_cols.shape = (C, HH, WW, N, out_h, out_w)
+        # self.output = col2im_6d_cython(out_cols, N, self.n_output_plane, H, W, HH, WW, pad, stride)
+
+        # if self.output.shape[1] != self.n_output:
+        #     import pdb; pdb.set_trace()
 
     def update_grad_input(self, input, grad_output, scale=1):
+        # TODO THIS IS BROKEN FIXME PLEASE :()
         w = self.bias
         F, _, HH, WW = w.shape
         stride = self.stride
@@ -122,7 +142,8 @@ class SpatialFullConvolution(Module):
         shape = (C, HH, WW, N, out_h, out_w)
         strides = (H * W, W, 1, C * H * W, stride * W, stride)
         strides = grad_output.itemsize * np.array(strides)
-        dout_stride = np.lib.stride_tricks.as_strided(grad_output, shape=shape, strides=strides)
+        dout_stride = np.lib.stride_tricks.as_strided(
+            grad_output, shape=shape, strides=strides)
         dout_cols = np.ascontiguousarray(dout_stride)
         dout_cols.shape = (C * HH * WW, N * out_h * out_w)
 

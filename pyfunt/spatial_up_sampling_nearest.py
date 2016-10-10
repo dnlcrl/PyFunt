@@ -23,14 +23,14 @@ class SpatialUpSamplingNearest(Module):
         super(SpatialUpSamplingNearest, self).__init__()
         self.scale_factor = scale
         if self.scale_factor < 1:
-            raise('scale_factor must be greater than 1')
+            raise Exception('scale_factor must be greater than 1')
         if np.floor(self.scale_factor) != self.scale_factor:
-            raise('scale_factor must be integer')
+            raise Exception('scale_factor must be integer')
 
     def update_output(self, x):
         out_size = x.shape
-        out_size[x.dims - 1] *= self.scale_factor
-        out_size[x.dims - 2] *= self.scale_factor
+        out_size[x.ndim - 1] *= self.scale_factor
+        out_size[x.ndim - 2] *= self.scale_factor
         N, C, H, W = out_size
 
         stride = self.scale_factor

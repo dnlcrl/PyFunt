@@ -23,7 +23,7 @@ class Threshold(Module):
     def validate_parameters(self):
         if self.inplace:
             if self.val > self.th:
-                raise('in-place processing requires value not exceed threshold')
+                raise Exception('in-place processing requires value not exceed threshold')
 
     def reset(self):
         pass

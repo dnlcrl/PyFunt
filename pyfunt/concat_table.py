@@ -30,10 +30,7 @@ class ConcatTable(Container):
                 args = self.modules[i], i, method, x, grad_output[i]
             else:
                 args = self.modules[i], i, method, x, grad_output[i], scale
-            try:
-                current_grad_input = self.rethrow_errors(*args)
-            except:
-                import pdb; pdb.set_trace()
+            current_grad_input = self.rethrow_errors(*args)
             if i == 0:
                 self.grad_input = current_grad_input
             else:

@@ -26,7 +26,7 @@ class View(Module):
 #     def __init__(self, args):
 #         super(View, self).__init__()
 #         self.reset_size(args)
-#         self.num_input_dims = None
+#         self.num_input.ndim = None
 
 #     def reset_size(self, args):
 #         if len(args) == 1 and type(args[0]) == 'float64':
@@ -41,9 +41,9 @@ class View(Module):
 #                 self.num_elements *= self.size[i]
 #             else:
 #                 if szi != -1:
-#                     raise('size should be positive or -1')
+#                     raise Exception('size should be positive or -1')
 #                 if inferdim:
-#                     raise('only one dimension can be at -1')
+#                     raise Exception('only one dimension can be at -1')
 #                 inferdim = True
 
 #     def update_output(self, x):

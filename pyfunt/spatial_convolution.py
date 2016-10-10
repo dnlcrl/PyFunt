@@ -64,15 +64,16 @@ class SpatialConvolution(Module):
         x_padded = np.pad(
             x, ((0, 0), (0, 0), (p, p), (p, p)), mode='constant')
 
-        self.tiles_w = (W + 2 * pad - WW) % stride
-        self.tiles_h = (H + 2 * pad - HH) % stride
+        self.tiles_w = (W + (2 * pad) - WW) % stride
+        self.tiles_h = (H + (2 * pad) - HH) % stride
         if not self.tiles_w == 0:
-            x_padded = x_padded[:, :, :-self.tiles_w, :]
+            x_padded = x_padded[:, :, :, :-self.tiles_w]
         if not self.tiles_h == 0:
-            x_padded = x_padded[:, :, :, :-self.tiles_h]
+            x_padded = x_padded[:, :, :-self.tiles_h, :]
 
         N, C, H, W = x_padded.shape
-        assert (W + 2 * pad - WW) % stride == 0, 'width does not work'
+        if (W + (2 * pad) - WW) % stride != 0:
+            raise Exception('width does not work')
 
         # H += 2 * pad
         # W += 2 * pad

@@ -270,7 +270,7 @@ class Module(object):
         parameters, grad_parameters = self.parameters()
         #p, g = Module.flatten(parameters), Module.flatten(grad_parameters)
         #if not p.n_element() == g.n_element():
-        #    raise('check that you are sharing parameters and gradParameters')
+        #    raise Exception('check that you are sharing parameters and gradParameters')
         return parameters, grad_parameters
 
     def __call__(self, _input=None, grad_output=None):
@@ -307,7 +307,7 @@ class Module(object):
 
                     # This shouldn't happen
                     if not len(cur_nodes) == len(cur_containers):
-                        raise('Internal error: incorrect return length')
+                        raise Exception('Internal error: incorrect return length')
 
                     # add the list items from our child to our list (ie return a
                     # flattened table of the return nodes).

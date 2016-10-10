@@ -22,14 +22,14 @@ class Sequential(Container):
     def insert(self, module, index=None):
         index = index or len(self.modules) + 1
         if index > len(self.modules) + 1 or index < 1:
-            raise('index should be contiguous to existing modules')
+            raise Exception('index should be contiguous to existing modules')
         self.modules.insert(module, index)
         self.output = self.modules[len(self.modules)].output
         self.grad_input = self.modules[0].grad_input  # 1??
 
     def remove(self, index):
         if index > len(self.modules) or index < 1:
-            raise('index out of range')
+            raise Exception('index out of range')
         self.modules.remove(index)
         if len(self.modules) > 0:
             self.output = self.modules[-1].output
@@ -41,8 +41,7 @@ class Sequential(Container):
     def update_output(self, x):
         current_output = x
         for i in xrange(len(self.modules)):
-            current_output = self.rethrow_errors(
-                self.modules[i], i, 'update_output', current_output)
+            current_output = self.rethrow_errors(self.modules[i], i, 'update_output', current_output)
         self.output = current_output
         return self.output
 
@@ -73,10 +72,7 @@ class Sequential(Container):
         for i in range(len(self.modules)-2, -1, -1):
             previous_module = self.modules[i]
             current_grad_output = self.rethrow_errors(current_module, i, 'backward', previous_module.output, current_grad_output, scale)
-            try:
-                current_module.grad_input[:] = current_grad_output[:]
-            except:
-                import pdb; pdb.set_trace()
+            current_module.grad_input[:] = current_grad_output[:]
             current_module = previous_module
 
         current_grad_output = self.rethrow_errors(current_module, 0, 'backward', x, current_grad_output, scale)

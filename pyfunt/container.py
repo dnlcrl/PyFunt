@@ -48,12 +48,12 @@ class Container(Module):
         self.apply_to_modules(lambda module: module.update_parameters(lr))
 
     def training(self):
+        super(Container, self).training()
         self.apply_to_modules(lambda module: module.training())
-        super(Container, self).training(self)
 
     def evaluate(self):
+        super(Container, self).evaluate()
         self.apply_to_modules(lambda module: module.evaluate())
-        super(Container, self).evaluate(self)
 
     def share(self, mlp, args):
         pass
