@@ -24,6 +24,8 @@ class SpatialFullConvolution(Module):
 
         self.dW = dW
         self.dH = dH
+        if padH != padW or dH != dW:
+            raise Exception('padH != padW or dH != dW, behaviout not implemented ')
         self.padW = padW
         self.padH = padH or self.padW
         self.adjW = adjW
@@ -61,8 +63,7 @@ class SpatialFullConvolution(Module):
         return (target_size + 2 * pad - ker) % stride
 
     def update_output(self, x):
-        # x->x, gradout ->x, gradinput->output
-        # x_shape-> outputshape
+
         w = self.weight
         F, FF, HH, WW = w.shape
 
@@ -72,18 +73,18 @@ class SpatialFullConvolution(Module):
         W = (inW - 1) * self.dW - 2*self.padW + WW  # x_shape
         H = (inH - 1) * self.dH - 2*self.padH + HH  # x_shape
         _, _, in_h, in_w = x.shape
-
+        #assert (H + 2 * pad - HH) % stride == 0, 'height does not work'
         x_reshaped = x.transpose(1, 0, 2, 3).reshape(F, -1)
         out_cols = w.reshape(F, -1).T.dot(x_reshaped)
         # out_cols.shape = (C, HH, WW, N, in_h, in_w)
         self.output = col2im_cython(out_cols, N, C, H, W, HH, WW, pad, stride)
         self.output += self.bias.reshape(1, -1, 1, 1)
-        if self.adjW:
-            self.output = np.pad(
-                self.output, ((0, 0), (0, 0), (0, self.adjW), (0, 0)), mode='constant')
         if self.adjH:
             self.output = np.pad(
-                self.output, ((0, 0), (0, 0), (0, 0), (0, self.adjH)), mode='constant')
+                self.output, ((0, 0), (0, 0), (0, self.adjH), (0, 0)), mode='constant')
+        if self.adjW:
+            self.output = np.pad(
+                self.output, ((0, 0), (0, 0), (0, 0), (0, self.adjW)), mode='constant')
         return self.output
 
 

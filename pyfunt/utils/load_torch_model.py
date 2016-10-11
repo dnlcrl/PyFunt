@@ -39,6 +39,10 @@ def spatial_max_pooling_init(m):
     return m['kW'], m['kH'], m['dW'], m['dH'], m['padW'], m['padH']
 
 
+def spatial_batch_normalization_init(m):
+    return len(m['running_mean']), m['eps'], m['momentum'], len(m['weight']) > 0
+
+
 def spatial_average_pooling_init(m):
     return m['kW'], m['kH'], m['dW'], m['dH'], m['padW'], m['padH']
 
@@ -63,6 +67,7 @@ load_parser_init = {
     'SpatialConvolution': conv_init,
     'SpatialMaxPooling': spatial_max_pooling_init,
     'SpatialAvergaePooling': spatial_average_pooling_init,
+    'SpatialBatchNormalization': spatial_batch_normalization_init,
     'SpatialFullConvolution': spatial_full_convolution_init,
     'SpatialReflectionPadding': spatial_padding_init,
     'SpatialReplicationPadding': spatial_padding_init,
@@ -167,7 +172,6 @@ def load_t7model(path=None, obj=None, model=None, custom_layers=None):
                     add_w(module, tmodule_o)
                     if class_name in load_parser_vals:
                         load_parser_vals[class_name](module, tmodule_o)
-
                     model.add(module)
             else:
                 print('oops!')
