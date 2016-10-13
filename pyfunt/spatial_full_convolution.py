@@ -123,15 +123,16 @@ class SpatialFullConvolution(Module):
         #     import pdb; pdb.set_trace()
 
     def update_grad_input(self, input, grad_output, scale=1):
+        raise NotImplementedError
         # TODO THIS IS BROKEN FIXME PLEASE :()
         w = self.bias
         F, _, HH, WW = w.shape
         stride = self.stride
 
-        if not self.adjW == 0:
-            grad_output = grad_output[:, :, :-self.adjW, :]
         if not self.adjH == 0:
-            grad_output = grad_output[:, :, :, :-self.adjH]
+            grad_output = grad_output[:, :, :-self.adjH, :]
+        if not self.adjW == 0:
+            grad_output = grad_output[:, :, :, :-self.adjW]
 
         N, C, H, W = grad_output.shape
 
@@ -150,7 +151,7 @@ class SpatialFullConvolution(Module):
         dout_cols.shape = (C * HH * WW, N * out_h * out_w)
 
         # Now all our convolutions are a big matrix multiply
-        res = w.reshape(F, -1).T.dot(dout_cols)
+        res = w.reshape(F, -1).dot(dout_cols)
 
         res.shape = (F, N, out_h, out_w)
         out = res.transpose(1, 0, 2, 3)

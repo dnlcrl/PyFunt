@@ -1,13 +1,8 @@
 import numpy as np
-from spatial_convolution import SpatialConvolution
-from spatial_batch_normalitazion import SpatialBatchNormalization
-from spatial_average_pooling import SpatialAveragePooling
-from sequential import Sequential
-from relu import ReLU
-from linear import Linear
-from reshape import Reshape
-from log_soft_max import LogSoftMax
-
+from pyfunt import (SpatialConvolution, SpatialBatchNormalization,
+                    SpatialAveragePooling, Sequential, ReLU, Linear,
+                    Reshape, LogSoftMax)
+from pyfunt.utils import eval_numerical_gradient_array
 
 def rel_error(x, y):
     """ returns relative error """
