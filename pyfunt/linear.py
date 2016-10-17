@@ -22,13 +22,15 @@ class Linear(Module):
 
     def reset(self, stdv=None):
         if stdv:
-            stdv = stdv * np.sqrt(3)
+            std = stdv * np.sqrt(3)
         else:
-            std = 1./np.sqrt(self.weight.shape[0])
-            # stdv = 1./np.sqrt(self.weight.shape[1])
+            std = 1./np.sqrt(self.weight.shape[0])  # fan-in (th default)
+            # std = 1./np.sqrt(self.weight.shape[1])  # fan-out
         self.weight = np.random.uniform(-std, std, self.weight.shape)
+        # self.weight = np.random.normal(std, size=self.weight.shape)
         if self.bias is not None:
             self.bias = np.random.uniform(-std, std, self.bias.shape)
+            # self.bias = np.zeros(self.bias.shape)
 
     def update_output(self, x):
         out = x.reshape(x.shape[0], -1)

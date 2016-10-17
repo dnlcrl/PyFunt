@@ -87,7 +87,6 @@ def init_worker():
 def loss_helper(args):
     model, criterion, x, y = args
     preds = model.forward(x)
-    import pdb; pdb.set_trace()
     loss = criterion.forward(preds, y)
     dout = criterion.backward(preds, y)
     _ = model.backward(x, dout)
