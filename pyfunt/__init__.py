@@ -1,5 +1,6 @@
 from affine import Affine
 from batch_normalization import BatchNormalization
+from bce_criterion import BCECriterion
 from c_add_table import CAddTable
 from class_nll_criterion import ClassNLLCriterion
 from concat_table import ConcatTable
