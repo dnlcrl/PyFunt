@@ -87,6 +87,7 @@ def init_worker():
 def loss_helper(args):
     model, criterion, x, y = args
     preds = model.forward(x)
+    import pdb; pdb.set_trace()
     loss = criterion.forward(preds, y)
     dout = criterion.backward(preds, y)
     _ = model.backward(x, dout)
@@ -405,7 +406,7 @@ class Solver(object):
         if not self.multiprocessing:
             # pred = model.forward(X_batch)
             # loss = self.criterion.forward(pred, y_batch)
-            loss, grads = self._loss_helper((X_batch, y_batch))
+            loss, grads = loss_helper((self.model, self.criterion, X_batch, y_batch))
         else:
             n = self.num_processes
             pool = self.pool
@@ -465,7 +466,7 @@ class Solver(object):
             num_batches += 1
         y_pred1 = []
         y_pred5 = []
-        self.pbar = tqdm(total=N, desc='Accuracy Check', unit='im')
+        self.pbar = tqdm(total=N, desc='Accuracy Check', unit='it')
         for i in xrange(num_batches):
             start = i * batch_size
             end = (i + 1) * batch_size
@@ -543,7 +544,7 @@ class Solver(object):
         if not self.silent_train:
             d = 'Epoch %d / %d' % (
                 self.epoch + 1, self.num_epochs)
-            self.pbar = tqdm(total=total, desc=d, unit='s.')
+            self.pbar = tqdm(total=total, desc=d, unit='it')
 
     def _update_bar(self, amount):
         if not self.silent_train:
