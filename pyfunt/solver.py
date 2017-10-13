@@ -10,10 +10,6 @@ from types import MethodType
 import sys
 from tqdm import tqdm
 
-# TODO: REMOVE THIS
-import pdb
-
-
 def rel_error(x, y):
     """ returns relative error """
     return np.max(np.abs(x - y) / (np.maximum(1e-8, np.abs(x) + np.abs(y))))
@@ -194,7 +190,7 @@ class Solver(object):
         # Unpack keyword arguments
         self.criterion = kwargs.pop('criterion', None)
         if self.criterion is None:
-            pdb.set_trace()
+            raise(Exception('Criterion cannot be None'))
 
         self.update_rule = kwargs.pop('update_rule', 'sgd')
         self.optim_config = kwargs.pop('optim_config', {})
@@ -289,7 +285,7 @@ class Solver(object):
                     os.path.join(self.path_checkpoints, name, name + '.pkl'))
             except:
                 print('sorry, I haven\'t fixed this line, but it should be easy to fix, if you want you can try now and make a pull request')
-                pdb.set_trace()
+                raise()
             # Set up some variables for book-keeping
 
             self.epoch = cp['epoch']
@@ -325,7 +321,7 @@ class Solver(object):
                 directory, name + '.pkl'))
         except:
             print('sorry, I haven\'t fixed this line, but it should be easy to fix, if you want you can try now and make a pull request')
-            pdb.set_trace()
+            raise()
 
     def export_model(self, path):
         if not os.path.exists(path):
