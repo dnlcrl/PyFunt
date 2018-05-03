@@ -1,5 +1,7 @@
 # PyFunt (/paɪfʊnt/)
 
+![Project frozen](https://img.shields.io/badge/status-frozen-blue.png) ![Project unmaintained](https://img.shields.io/badge/project-unmaintained-red.svg)
+
 Pythonic Deep Learning Framework (WIP and CPU only) inspired by [Torch](http://torch.ch)'s [Neural Network package](https://github.com/torch/nn).
 
 ## Requirements
